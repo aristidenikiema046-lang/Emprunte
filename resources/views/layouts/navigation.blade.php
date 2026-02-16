@@ -1,0 +1,1 @@
+{{-- L'ancienne navigation est désactivée car nous utilisons la Sidebar dans app.blade.php --}}
