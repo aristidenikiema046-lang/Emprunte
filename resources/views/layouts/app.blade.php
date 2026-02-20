@@ -11,7 +11,7 @@
         <div class="flex h-screen overflow-hidden">
             <nav class="w-64 bg-gray-900 text-white flex flex-col">
                 <div class="p-6 text-2xl font-bold border-b border-gray-800">
-                    Emprunte
+                    Empruntef
                 </div>
                 
                 <div class="flex-1 overflow-y-auto py-4">
