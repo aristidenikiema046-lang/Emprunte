@@ -16,7 +16,7 @@
                 
                 <div class="flex-1 overflow-y-auto py-4">
                     <x-nav-link-sidebar :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        Dashboard
+                        Dashboardddd
                     </x-nav-link-sidebar>
 
                     <x-nav-link-sidebar :href="route('attendances.index')" :active="request()->routeIs('attendances.index')">
