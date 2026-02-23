@@ -13,12 +13,10 @@ class Task extends Model
         'user_id',
         'title',
         'description',
-        'deadline',
         'priority',
-        'status',
         'progress',
-        'is_completed', // Corrigé : ajouté
-        'completed_at', // Corrigé : ajouté
+        'is_completed',
+        'completed_at',
     ];
 
     protected $casts = [

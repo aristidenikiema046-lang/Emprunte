@@ -10,6 +10,7 @@ class TaskController extends Controller
 {
     public function index()
     {
+        // On récupère les utilisateurs pour le formulaire d'assignation
         $users = User::where('role', '!=', 'admin')->get();
 
         if (auth()->user()->isAdmin()) {
@@ -35,16 +36,19 @@ class TaskController extends Controller
             'is_completed' => false,
         ]);
 
-        return back()->with('success', 'Mission assignée !');
+        return back()->with('success', 'Mission assignée avec succès !');
     }
 
     public function updateProgress(Request $request, Task $task)
     {
+        // Sécurité : Seul le propriétaire de la tâche peut cliquer sur les boutons
         if ($task->user_id !== auth()->id()) {
             abort(403);
         }
 
-        $request->validate(['progress' => 'required|integer|min:0|max:100']);
+        $request->validate([
+            'progress' => 'required|integer|in:25,50,75,100',
+        ]);
 
         $task->update([
             'progress' => $request->progress,
@@ -52,7 +56,7 @@ class TaskController extends Controller
             'completed_at' => ($request->progress == 100) ? now() : null,
         ]);
 
-        return back();
+        return back()->with('success', "Progression mise à jour à {$request->progress}%");
     }
 
     public function toggle(Task $task)
@@ -65,10 +69,10 @@ class TaskController extends Controller
 
         $task->update([
             'is_completed' => $newStatus,
-            'progress' => $newStatus ? 100 : 90, // Si on rouvre, on met à 90%
+            'progress' => $newStatus ? 100 : 0,
             'completed_at' => $newStatus ? now() : null
         ]);
 
-        return back();
+        return back()->with('success', 'Statut modifié.');
     }
 }
