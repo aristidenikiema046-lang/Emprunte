@@ -23,12 +23,9 @@
                     @auth
                         <a href="{{ url('/dashboard') }}" class="text-sm font-bold hover:text-indigo-400 transition">Tableau de Bord</a>
                     @else
-                        <a href="{{ route('login') }}" class="text-sm font-bold hover:text-indigo-400 transition">Connexion</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-indigo-500/20">
-                                Inscription
-                            </a>
-                        @endif
+                        <a href="{{ route('login') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-indigo-500/20">
+                            Connexion
+                        </a>
                     @endauth
                 @endif
             </div>
@@ -55,8 +52,8 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 rounded-2xl font-black uppercase text-sm hover:bg-slate-200 transition-all shadow-xl">
-                        Créer un compte
+                    <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 rounded-2xl font-black uppercase text-sm hover:bg-slate-200 transition-all shadow-xl">
+                        Accéder à l'Espace
                     </a>
                     <a href="#features" class="w-full sm:w-auto px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-sm border border-slate-700 hover:bg-slate-700 transition-all">
                         Voir les fonctionnalités
