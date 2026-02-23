@@ -33,6 +33,12 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            // Validation personnalisée pour le code d'invitation
+            'invite_code' => ['required', 'string', function ($attribute, $value, $fail) {
+                if ($value !== env('INVITATION_CODE')) {
+                    $fail('Le code d\'invitation est incorrect. Accès réservé au personnel de l\'entreprise.');
+                }
+            }],
         ]);
 
         $user = User::create([

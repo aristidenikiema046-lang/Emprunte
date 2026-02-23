@@ -62,6 +62,17 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <div class="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+            <x-input-label for="invite_code" :value="__('Code d\'invitation Entreprise')" class="font-semibold text-indigo-700" />
+            <x-text-input id="invite_code" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm"
+                            type="text"
+                            name="invite_code" 
+                            required 
+                            placeholder="Ex: EMPRUNTE-2026" />
+            <p class="text-xs text-indigo-500 mt-1">Ce code est obligatoire pour valider votre inscription.</p>
+            <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
+        </div>
+
         <div class="flex flex-col items-center justify-end mt-6 space-y-4">
             <x-primary-button class="w-full justify-center py-3 btn-emprunte uppercase tracking-widest text-xs font-bold">
                 {{ __('S\'inscrire') }}
