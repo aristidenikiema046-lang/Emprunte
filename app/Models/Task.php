@@ -10,13 +10,20 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',     // L'ID de celui qui reçoit la tâche
+        'user_id',
         'title',
         'description',
         'deadline',
-        'priority',    // Ex: Basse, Moyenne, Haute
-        'status',      // Ex: En attente, En cours, Terminé
-        'progress',    // Pour la barre de progression (0 à 100)
+        'priority',
+        'status',
+        'progress',
+        'is_completed', // Corrigé : ajouté
+        'completed_at', // Corrigé : ajouté
+    ];
+
+    protected $casts = [
+        'is_completed' => 'boolean',
+        'completed_at' => 'datetime',
     ];
 
     public function user()
