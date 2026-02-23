@@ -11,7 +11,7 @@
         <div class="flex h-screen overflow-hidden">
             <nav class="w-64 bg-gray-900 text-white flex flex-col">
                 <div class="p-6 text-2xl font-bold border-b border-gray-800">
-                    Empruntef
+                    Emprunte
                 </div>
                 
                 <div class="flex-1 overflow-y-auto py-4">
@@ -33,9 +33,12 @@
                     
                     <x-nav-link-sidebar :href="route('payroll.index')" :active="request()->routeIs('payroll.index')"> Paie </x-nav-link-sidebar>
                     
-                    <x-nav-link-sidebar :href="route('users.index')" :active="request()->routeIs('users.index')">
-                        Utilisateurs
-                    </x-nav-link-sidebar>
+                    {{-- Seul l'admin voit ce lien --}}
+                    @if(Auth::user()->isAdmin())
+                        <x-nav-link-sidebar :href="route('users.index')" :active="request()->routeIs('users.index')">
+                            Utilisateurs
+                        </x-nav-link-sidebar>
+                    @endif
                     
                     <x-nav-link-sidebar :href="route('messages.index')" :active="request()->routeIs('messages.index')">
                         Messages
@@ -72,7 +75,6 @@
                     <x-nav-link-sidebar :href="route('evaluations.index')" :active="request()->routeIs('evaluations.*')">
                         <div class="flex items-center">
                             <span>Évaluations</span>
-                            <span class="ml-2 bg-blue-600 text-[10px] px-1.5 py-0.5 rounded uppercase font-black tracking-tighter"></span>
                         </div>
                     </x-nav-link-sidebar>
                 </div>
