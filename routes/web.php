@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/users', [UserController::class, 'store'])->name('users.store');
         Route::patch('/admin/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::patch('/admin/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
     });
 
     // --- Communication ---

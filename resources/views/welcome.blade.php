@@ -6,6 +6,7 @@
     <title>ManageX | Pilotage d'Entreprise</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="antialiased bg-[#0f172a] text-slate-200 selection:bg-indigo-500 selection:text-white">
     
@@ -23,9 +24,12 @@
                     @auth
                         <a href="{{ url('/dashboard') }}" class="text-sm font-bold hover:text-indigo-400 transition">Tableau de Bord</a>
                     @else
-                        <a href="{{ route('login') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-indigo-500/20">
-                            Connexion
-                        </a>
+                        <a href="{{ route('login') }}" class="text-sm font-bold hover:text-indigo-400 transition">Connexion</a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-indigo-500/20">
+                                Demande d'accès
+                            </a>
+                        @endif
                     @endauth
                 @endif
             </div>
@@ -40,6 +44,16 @@
             </div>
 
             <div class="max-w-7xl mx-auto px-6 text-center">
+                
+                {{-- Message de succès après inscription --}}
+                @if(session('success'))
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 6000)" x-show="show" 
+                     class="max-w-md mx-auto mb-8 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-sm font-bold flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ session('success') }}
+                </div>
+                @endif
+
                 <div class="inline-block px-4 py-1.5 mb-6 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-xs font-black uppercase tracking-widest">
                     Solution RH & Gestion de Tâches
                 </div>
@@ -53,11 +67,13 @@
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-4 bg-white text-slate-950 rounded-2xl font-black uppercase text-sm hover:bg-slate-200 transition-all shadow-xl">
-                        Accéder à l'Espace
+                        Se connecter
                     </a>
-                    <a href="#features" class="w-full sm:w-auto px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-sm border border-slate-700 hover:bg-slate-700 transition-all">
-                        Voir les fonctionnalités
+                    @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-sm border border-slate-700 hover:bg-slate-700 transition-all">
+                        Demander un accès
                     </a>
+                    @endif
                 </div>
             </div>
         </section>

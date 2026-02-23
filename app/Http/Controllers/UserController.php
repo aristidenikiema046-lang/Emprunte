@@ -50,4 +50,20 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'Rôle mis à jour pour ' . $user->name);
     }
+
+    public function toggleStatus(User $user)
+    {
+        // Sécurité : on ne se bloque pas soi-même
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Action impossible sur votre compte.');
+        }
+
+        // On inverse le statut (si 0 devient 1, si 1 devient 0)
+        $user->update([
+            'is_active' => !$user->is_active
+        ]);
+
+        $status = $user->is_active ? 'autorisé' : 'bloqué';
+        return back()->with('success', "Le compte de {$user->name} est désormais {$status}.");
+    }
 }
