@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             // Validation personnalisée pour le code d'invitation
             'invite_code' => ['required', 'string', function ($attribute, $value, $fail) {
-                if ($value !== env('INVITATION_CODE')) {
+                if ($value !== config('app.invitation_code', env('INVITATION_CODE'))) {
                     $fail('Le code d\'invitation est incorrect. Accès réservé au personnel de l\'entreprise.');
                 }
             }],
