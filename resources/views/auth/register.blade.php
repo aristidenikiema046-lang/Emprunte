@@ -26,25 +26,28 @@
     </style>
 
     <div class="mb-6 text-center">
-        <h2 class="text-2xl font-bold text-gray-800">Créer un compte</h2>
-        <p class="text-sm text-gray-600">Rejoignez l'aventure <span class="text-emprunte font-bold">Emprunte</span></p>
+        <h2 class="text-2xl font-bold text-gray-800">Demander un accès</h2>
+        <p class="text-sm text-gray-600">Rejoignez l'espace collaboratif <span class="text-emprunte font-bold">Emprunte</span></p>
     </div>
 
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        {{-- Nom --}}
         <div>
             <x-input-label for="name" :value="__('Nom complet')" class="font-semibold text-gray-700" />
             <x-text-input id="name" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
+        {{-- Email --}}
         <div class="mt-4">
             <x-input-label for="email" :value="__('Adresse Email')" class="font-semibold text-gray-700" />
             <x-text-input id="email" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        {{-- Password --}}
         <div class="mt-4">
             <x-input-label for="password" :value="__('Mot de passe')" class="font-semibold text-gray-700" />
             <x-text-input id="password" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm"
@@ -54,6 +57,7 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
+        {{-- Confirmation Password --}}
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirmer le mot de passe')" class="font-semibold text-gray-700" />
             <x-text-input id="password_confirmation" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm"
@@ -62,6 +66,7 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        {{-- Invitation Code --}}
         <div class="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
             <x-input-label for="invite_code" :value="__('Code d\'invitation Entreprise')" class="font-semibold text-indigo-700" />
             <x-text-input id="invite_code" class="block mt-1 w-full border-gray-300 input-emprunte rounded-lg shadow-sm"
@@ -69,13 +74,13 @@
                             name="invite_code" 
                             required 
                             placeholder="Ex: EMPRUNTE-2026" />
-            <p class="text-xs text-indigo-500 mt-1">Ce code est obligatoire pour valider votre inscription.</p>
+            <p class="text-xs text-indigo-500 mt-1">Ce code est obligatoire pour soumettre votre demande.</p>
             <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
         </div>
 
         <div class="flex flex-col items-center justify-end mt-6 space-y-4">
             <x-primary-button class="w-full justify-center py-3 btn-emprunte uppercase tracking-widest text-xs font-bold">
-                {{ __('S\'inscrire') }}
+                {{ __('Envoyer la demande d\'accès') }}
             </x-primary-button>
 
             <a class="underline text-sm text-gray-600 hover:text-indigo-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
