@@ -81,11 +81,11 @@
 
                             {{-- Colonne Actions --}}
                             <td class="px-8 py-5">
-                                <div class="flex justify-end items-center gap-2">
+                                <div class="flex justify-end items-center gap-3">
                                     @if($user->id !== auth()->id())
                                         
                                         {{-- Bouton pour Accepter / Bloquer --}}
-                                        <form action="{{ route('users.toggleStatus', $user) }}" method="POST">
+                                        <form action="{{ route('users.toggleStatus', $user) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
                                             @if(!$user->is_active)
@@ -93,23 +93,23 @@
                                                     <i class="fa-solid fa-check"></i> Accepter
                                                 </button>
                                             @else
-                                                <button type="submit" title="Bloquer l'accès" class="p-2 text-slate-500 hover:text-amber-500 transition-colors">
+                                                <button type="submit" title="Suspendre l'accès" class="p-2.5 bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-500 rounded-xl transition-all border border-slate-700">
                                                     <i class="fa-solid fa-user-slash"></i>
                                                 </button>
                                             @endif
                                         </form>
 
                                         {{-- Bouton Supprimer --}}
-                                        <form action="{{ route('users.destroy', $user) }}" method="POST" onsubmit="return confirm('Supprimer ce compte définitivement ?')">
+                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Attention : Supprimer définitivement le compte de {{ $user->name }} ?')">
                                             @csrf 
                                             @method('DELETE')
-                                            <button type="submit" class="p-2 text-slate-600 hover:text-red-500 transition-colors">
+                                            <button type="submit" class="p-2.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-xl transition-all border border-slate-700">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </form>
 
                                     @else
-                                        <span class="text-[10px] text-slate-600 italic">Aucune action</span>
+                                        <span class="text-[10px] text-slate-600 italic px-4">Propriétaire</span>
                                     @endif
                                 </div>
                             </td>
