@@ -7,29 +7,30 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    /**
+     * Affiche la vue d'inscription.
+     */
     public function create(): View
     {
         return view('auth.register');
     }
 
+    /**
+     * Gère une demande d'inscription entrante.
+     */
     public function store(Request $request): RedirectResponse
     {
+        // On retire la validation de 'invite_code' car le champ est supprimé de la vue
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'invite_code' => ['required', 'string', function ($attribute, $value, $fail) {
-                if ($value !== config('app.invitation_code', env('INVITATION_CODE'))) {
-                    $fail('Le code d\'invitation est incorrect. Accès réservé au personnel.');
-                }
-            }],
         ]);
 
         $user = User::create([
@@ -37,13 +38,13 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'user',
-            'is_active' => false, // BLOQUÉ PAR DÉFAUT
+            'is_active' => false, // L'utilisateur est bloqué jusqu'à validation par l'admin
         ]);
 
         event(new Registered($user));
 
-        // Suppression de Auth::login($user); pour ne pas connecter l'utilisateur
+        // L'utilisateur n'est PAS connecté automatiquement (Auth::login est retiré)
         
-        return redirect()->route('login')->with('success', 'Demande envoyée ! L\'administrateur doit valider votre accès.');
+        return redirect()->route('login')->with('success', 'Votre demande d\'accès a été envoyée ! Un administrateur doit maintenant valider votre compte.');
     }
 }
