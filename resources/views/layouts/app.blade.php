@@ -4,11 +4,16 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+
         <title>{{ config('app.name', 'Emprunte') }}</title>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-gray-100">
         <div class="flex h-screen overflow-hidden">
+            {{-- Sidebar --}}
             <nav class="w-64 bg-gray-900 text-white flex flex-col">
                 <div class="p-6 text-2xl font-bold border-b border-gray-800">
                     Emprunte
@@ -31,10 +36,12 @@
                         Congés
                     </x-nav-link-sidebar>
                     
-                    <x-nav-link-sidebar :href="route('payroll.index')" :active="request()->routeIs('payroll.index')"> Paie </x-nav-link-sidebar>
+                    <x-nav-link-sidebar :href="route('payroll.index')" :active="request()->routeIs('payroll.index')"> 
+                        Paie 
+                    </x-nav-link-sidebar>
                     
-                    {{-- Seul l'admin voit ce lien --}}
-                    @if(Auth::user()->isAdmin())
+                    {{-- Accès Admin --}}
+                    @if(Auth::user()->role === 'admin')
                         <x-nav-link-sidebar :href="route('users.index')" :active="request()->routeIs('users.index')">
                             Utilisateurs
                         </x-nav-link-sidebar>
@@ -44,6 +51,7 @@
                         Messages
                     </x-nav-link-sidebar>
 
+                    {{-- Dropdown Documents --}}
                     <div x-data="{ open: {{ request()->routeIs('documents.*') ? 'true' : 'false' }} }">
                         <button @click="open = !open" 
                                 class="w-full flex items-center justify-between px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-all focus:outline-none">
@@ -73,25 +81,27 @@
                     </x-nav-link-sidebar>
 
                     <x-nav-link-sidebar :href="route('evaluations.index')" :active="request()->routeIs('evaluations.*')">
-                        <div class="flex items-center">
-                            <span>Évaluations</span>
-                        </div>
+                        Évaluations
                     </x-nav-link-sidebar>
                 </div>
-                
 
+                {{-- Logout --}}
                 <div class="p-4 border-t border-gray-800">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-gray-400 hover:text-white text-sm">Déconnexion</button>
+                        <button type="submit" class="w-full text-left text-gray-400 hover:text-red-400 text-sm transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Déconnexion
+                        </button>
                     </form>
                 </div>
             </nav>
 
-            <main class="flex-1 overflow-y-auto p-8">
+            {{-- Main Content --}}
+            <main class="flex-1 overflow-y-auto p-0 md:p-8 bg-slate-950">
                 {{ $slot }}
             </main>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </body>
 </html>
