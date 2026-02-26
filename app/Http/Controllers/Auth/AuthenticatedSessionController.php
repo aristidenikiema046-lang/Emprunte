@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,27 +24,26 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // 1. On tente d'authentifier l'utilisateur (vérification email/password)
+        // 1. Authentification (Vérifie email et password)
         $request->authenticate();
 
-        // 2. Vérification du statut "is_active"
-        // Si l'utilisateur est authentifié mais que son compte est à 0 (false)
+        // 2. Vérification du statut is_active
         if (!auth()->user()->is_active) {
-            $userName = auth()->user()->name;
+            $name = auth()->user()->name;
             
-            // On le déconnecte immédiatement
+            // Déconnexion immédiate si le compte n'est pas validé
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // On le redirige vers le login avec le message d'attente
-            return redirect()->route('login')->with('error', "Bonjour $userName, votre accès est en attente de validation par l'administrateur.");
+            return redirect()->route('login')->with('error', "Désolé $name, votre accès n'a pas encore été validé par l'administrateur.");
         }
 
-        // 3. Si le compte est actif, on régénère la session normalement
+        // 3. Si tout est bon, on génère la session
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // 4. Redirection vers le dashboard (Correction de l'erreur RouteServiceProvider)
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
