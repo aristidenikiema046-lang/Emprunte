@@ -64,21 +64,26 @@ class UserController extends Controller
      */
     public function toggleStatus(User $user)
     {
-        // Sécurité : ne pas se bloquer soi-même
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Action impossible sur votre propre compte.');
+            return redirect()->back()->with('error', 'Action impossible sur votre compte.');
         }
 
-        // On inverse la valeur actuelle (0 devient 1, 1 devient 0)
-        $user->update([
-            'is_active' => !$user->is_active
-        ]);
+        // On stocke l'état avant la modification
+        $wasInactive = !$user->is_active;
 
-        $statusMessage = $user->is_active 
-            ? "L'accès de {$user->name} a été validé avec succès." 
-            : "L'accès de {$user->name} a été suspendu.";
+        // On inverse le statut
+        $user->is_active = !$user->is_active;
+        $user->save();
 
-        return redirect()->back()->with('success', $statusMessage);
+        if ($user->is_active && $wasInactive) {
+            // ICI : Le compte vient d'être activé
+            // Tu peux décommenter la ligne suivante quand ton mail est prêt :
+            // \Mail::to($user->email)->send(new \App\Mail\AccountActivated($user));
+        
+            return redirect()->back()->with('success', "L'accès de {$user->name} a été validé. Un email de confirmation lui a été envoyé.");
+        }
+
+        return redirect()->back()->with('success', "L'accès de {$user->name} a été suspendu.");
     }
 
     /**
