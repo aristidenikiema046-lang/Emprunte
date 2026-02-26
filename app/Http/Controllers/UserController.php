@@ -8,15 +8,21 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * Affiche la liste des utilisateurs
+     */
     public function index()
     {
-        $users = User::all();
-        // Compte total pour l'affichage "Total : X collaborateurs"
-        $totalCollaborateurs = User::count(); 
-        return view('admin.users.index', compact('users', 'totalCollaborateurs'));
+        // On récupère tous les utilisateurs
+        // On peut trier pour mettre les "En attente" (is_active = 0) en haut
+        $users = User::orderBy('is_active', 'asc')->get();
+        
+        return view('admin.users.index', compact('users'));
     }
 
-    // Fonction pour le bouton "CRÉER" du formulaire modal
+    /**
+     * Création d'un utilisateur via le bouton "Ajouter un membre" (Modal)
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -29,41 +35,64 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Par défaut, on crée un employé
+            'role' => 'user',
+            'is_active' => true, // Les comptes créés par l'admin sont actifs par défaut
         ]);
 
-        return redirect()->back()->with('success', 'Utilisateur créé avec succès !');
+        return redirect()->back()->with('success', 'Collaborateur ajouté avec succès !');
     }
 
-    // Fonction pour changer le rôle (Admin <-> Employé)
-    public function updateRole(Request $request, User $user)
+    /**
+     * Alterne le rôle entre 'admin' et 'user'
+     */
+    public function updateRole(User $user)
     {
-        // On bascule le rôle
-        $newRole = ($user->role === 'admin') ? 'user' : 'admin';
-        
-        // Sécurité : ne pas s'enlever son propre rôle admin
+        // Sécurité : ne pas modifier son propre rôle pour ne pas perdre l'accès admin
         if ($user->id === auth()->id()) {
             return redirect()->back()->with('error', 'Vous ne pouvez pas modifier votre propre rôle.');
         }
 
+        $newRole = ($user->role === 'admin') ? 'user' : 'admin';
         $user->update(['role' => $newRole]);
 
-        return redirect()->back()->with('success', 'Rôle mis à jour pour ' . $user->name);
+        return redirect()->back()->with('success', "Le rôle de {$user->name} a été mis à jour.");
     }
 
+    /**
+     * Alterne le statut entre Actif (1) et Bloqué (0)
+     * C'est cette fonction qui est appelée par le bouton "ACCEPTER"
+     */
     public function toggleStatus(User $user)
     {
-        // Sécurité : on ne se bloque pas soi-même
+        // Sécurité : ne pas se bloquer soi-même
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'Action impossible sur votre compte.');
+            return redirect()->back()->with('error', 'Action impossible sur votre propre compte.');
         }
 
-        // On inverse le statut (si 0 devient 1, si 1 devient 0)
+        // On inverse la valeur actuelle (0 devient 1, 1 devient 0)
         $user->update([
             'is_active' => !$user->is_active
         ]);
 
-        $status = $user->is_active ? 'autorisé' : 'bloqué';
-        return back()->with('success', "Le compte de {$user->name} est désormais {$status}.");
+        $statusMessage = $user->is_active 
+            ? "L'accès de {$user->name} a été validé avec succès." 
+            : "L'accès de {$user->name} a été suspendu.";
+
+        return redirect()->back()->with('success', $statusMessage);
+    }
+
+    /**
+     * Supprime définitivement un utilisateur
+     */
+    public function destroy(User $user)
+    {
+        // Sécurité : ne pas se supprimer soi-même
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
+        }
+
+        $user->delete();
+
+        return redirect()->back()->with('success', "Le compte a été supprimé définitivement.");
     }
 }
