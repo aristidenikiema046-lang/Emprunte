@@ -12,7 +12,17 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Affiche la page du profil (Vue personnalisée).
+     */
+    public function show(Request $request): View
+    {
+        return view('profile.show', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Affiche le formulaire d'édition standard.
      */
     public function edit(Request $request): View
     {
@@ -22,23 +32,37 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Met à jour les informations du profil.
+     * Note : Assure-toi que ProfileUpdateRequest contient les nouveaux champs
+     * ou utilise la validation directe ci-dessous.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Validation des données (incluant tes nouveaux champs)
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'gender' => ['nullable', 'string', 'in:Homme,Femme'],
+            'birth_date' => ['nullable', 'date'],
+            // On laisse l'admin gérer le poste et le département pour plus de sécurité
+        ]);
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
 
     /**
-     * Delete the user's account.
+     * Supprime le compte de l'utilisateur.
      */
     public function destroy(Request $request): RedirectResponse
     {
