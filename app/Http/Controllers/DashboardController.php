@@ -43,6 +43,6 @@ class DashboardController extends Controller
         $myPendingLeavesCount = $user->leaves()->where('status', 'pending')->count();
 
         // On pointe vers le dossier "user" (vérifiez si votre dossier est 'user' ou 'users')
-        return view('users.dashboard', compact('myTasks', 'myProgress', 'myAttendanceToday', 'myPendingLeavesCount'));
+        return view('user.dashboard', compact('myTasks', 'myProgress', 'myAttendanceToday', 'myPendingLeavesCount'));
     }
 }
