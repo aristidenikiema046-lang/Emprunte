@@ -41,7 +41,6 @@ class TaskController extends Controller
 
     public function updateProgress(Request $request, Task $task)
     {
-        // Sécurité : Seul le propriétaire de la tâche peut cliquer sur les boutons
         if ($task->user_id !== auth()->id()) {
             abort(403);
         }
@@ -74,5 +73,18 @@ class TaskController extends Controller
         ]);
 
         return back()->with('success', 'Statut modifié.');
+    }
+
+    // --- AJOUTÉ : Fonction de suppression ---
+    public function destroy(Task $task)
+    {
+        // Seul l'admin peut supprimer une tâche
+        if (!auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $task->delete();
+
+        return back()->with('success', 'La mission a été supprimée.');
     }
 }

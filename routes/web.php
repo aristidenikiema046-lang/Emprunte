@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     
     // --- Profil ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    @patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // --- Présences ---
@@ -37,13 +37,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.progress');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy'); // <--- AJOUTÉ : Résout l'erreur RouteNotFound
     
     // --- Congés ---
     Route::get('/leaves', [LeaveController::class, 'index'])->name('leaves.index');
     Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
     Route::patch('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.update');
 
-    // --- PAIE (Accès mixte : Admin voit tout, User voit ses bulletins) ---
+    // --- PAIE ---
     Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index'); 
 
     // --- ROUTES RÉSERVÉES À L'ADMIN ---
@@ -71,25 +72,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/{poll}', [PollController::class, 'show'])->name('show');
         Route::post('/{poll}/vote', [PollController::class, 'vote'])->name('vote');
 
-        // Seul l'admin peut créer
         Route::middleware('can:admin-only')->group(function() {
             Route::get('/create', [PollController::class, 'create'])->name('create');
             Route::post('/', [PollController::class, 'store'])->name('store');
         });
     });
 
-    // --- Documents (Correction de l'erreur RouteNotFound) ---
+    // --- Documents ---
     Route::prefix('documents')->name('documents.')->group(function () {
-        Route::get('/received', [DocumentController::class, 'index'])->name('received'); // Reçus
-        Route::get('/sent', [DocumentController::class, 'sent'])->name('sent');         // <--- AJOUTÉ : Résout l'erreur 403/500
-        Route::get('/create', [DocumentController::class, 'create'])->name('create');   // <--- AJOUTÉ : Pour le formulaire d'envoi
+        Route::get('/received', [DocumentController::class, 'index'])->name('received');
+        Route::get('/sent', [DocumentController::class, 'sent'])->name('sent');
+        Route::get('/create', [DocumentController::class, 'create'])->name('create');
         Route::post('/', [DocumentController::class, 'store'])->name('store');
         Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
     });
 
-     // --- Évaluations / Notes ---
+    // --- Évaluations ---
     Route::get('/evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
-
     Route::middleware('can:admin-only')->group(function() {
         Route::post('/evaluations', [EvaluationController::class, 'store'])->name('evaluations.store');
     });
