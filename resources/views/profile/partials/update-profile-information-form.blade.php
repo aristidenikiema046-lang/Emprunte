@@ -1,4 +1,4 @@
-<section class="relative">
+<section class="relative bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
     {{-- Décoration d'arrière-plan pour le relief --}}
     <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#1a3a3a]/5 rounded-full blur-3xl -z-10"></div>
 
@@ -10,8 +10,8 @@
         <div class="flex flex-col md:flex-row items-center gap-10">
             <div class="relative group">
                 <div class="w-40 h-40 rounded-[2.5rem] rotate-3 group-hover:rotate-0 transition-all duration-500 border-[6px] border-white shadow-2xl overflow-hidden bg-[#1a3a3a]">
-                    <img id="preview" 
-                         src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=1a3a3a&color=fff' }}" 
+                    <img id="preview"
+                         src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=1a3a3a&color=fff' }}"
                          class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-500">
                 </div>
                 <label for="avatar" class="absolute -bottom-4 -right-4 bg-white text-[#1a3a3a] p-4 rounded-2xl shadow-xl cursor-pointer hover:bg-[#1a3a3a] hover:text-white transition-all duration-300 group-hover:scale-110">
@@ -27,12 +27,12 @@
             </div>
         </div>
 
-        {{-- 2. GRILLE D'INFORMATIONS --}}
+        {{-- 2. GRILLE D'INFORMATIONS AVEC EFFET GLASSMORPHISM --}}
         <div class="bg-white/60 backdrop-blur-xl rounded-[3rem] p-10 shadow-2xl shadow-gray-200/50 border border-white space-y-10">
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                
-                {{-- Champ Nom --}}
+
+                {{-- Champ Nom Complet --}}
                 <div class="group">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1 group-focus-within:text-[#1a3a3a] transition-colors">Nom Complet</label>
                     <div class="relative">
@@ -42,7 +42,7 @@
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
-                {{-- Champ Email --}}
+                {{-- Champ Email Pro --}}
                 <div class="group">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1 group-focus-within:text-[#1a3a3a] transition-colors">Email Pro</label>
                     <div class="relative">
@@ -51,7 +51,7 @@
                     </div>
                 </div>
 
-                {{-- Champ Téléphone --}}
+                {{-- Champ Contact Mobile --}}
                 <div class="group">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1 group-focus-within:text-[#1a3a3a] transition-colors">Contact Mobile</label>
                     <div class="relative">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
 
-                {{-- Champ Adresse --}}
+                {{-- Champ Adresse de résidence (Pleine largeur) --}}
                 <div class="md:col-span-2 group">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1 group-focus-within:text-[#1a3a3a] transition-colors">Adresse de résidence</label>
                     <div class="relative">
@@ -84,11 +84,11 @@
 
             <hr class="border-gray-100">
 
-            {{-- 3. SECTION ADMINISTRATIVE --}}
+            {{-- 3. SECTION ADMINISTRATIVE & D'URGENCE --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div class="space-y-6">
                     <h3 class="text-xs font-black uppercase tracking-widest text-[#1a3a3a] flex items-center gap-3">
-                        <span class="w-6 h-[2px] bg-[#1a3a3a]"></span> 
+                        <span class="w-6 h-[2px] bg-[#1a3a3a]"></span>
                         Vie Privée
                     </h3>
                     <div class="space-y-4">
@@ -97,9 +97,10 @@
                     </div>
                 </div>
 
+                {{-- Contact d'Urgence --}}
                 <div class="space-y-6">
                     <h3 class="text-xs font-black uppercase tracking-widest text-[#1a3a3a] flex items-center gap-3">
-                        <span class="w-6 h-[2px] bg-[#1a3a3a]"></span> 
+                        <span class="w-6 h-[2px] bg-[#1a3a3a]"></span>
                         Urgence (Sécurité)
                     </h3>
                     <div class="p-6 bg-[#1a3a3a] rounded-[2rem] shadow-xl shadow-[#1a3a3a]/20 space-y-4">
@@ -113,7 +114,7 @@
             </div>
         </div>
 
-        {{-- 4. FLOATING ACTION BAR --}}
+        {{-- 4. FLOATING ACTION BAR POUR LA SAUVEGARDE --}}
         <div class="sticky bottom-8 flex items-center justify-between p-4 bg-[#1a3a3a] rounded-[2rem] shadow-2xl shadow-[#1a3a3a]/40 group transition-all duration-500 hover:scale-[1.02]">
             <div class="pl-6">
                 @if (session('status') === 'profile-updated')
@@ -132,13 +133,13 @@
     </form>
 </section>
 
+{{-- Script pour la prévisualisation de l'image et l'animation flash lors du changement --}}
 <script>
     function previewImage(event) {
         var reader = new FileReader();
         reader.onload = function(){
             var output = document.getElementById('preview');
             output.src = reader.result;
-            // Animation flash lors du changement
             output.parentElement.classList.add('animate-pulse');
             setTimeout(() => output.parentElement.classList.remove('animate-pulse'), 1000);
         };
