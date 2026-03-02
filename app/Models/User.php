@@ -65,6 +65,10 @@ class User extends Authenticatable
         ];
     }
 
+    // =========================================================================
+    // RELATIONS
+    // =========================================================================
+
     /**
      * Relation avec les tâches
      */
@@ -82,10 +86,30 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les présences (Correction de l'erreur actuelle)
+     * Relation avec les présences
      */
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    // =========================================================================
+    // MÉTHODES DE RÔLES (Correction de l'erreur)
+    // =========================================================================
+
+    /**
+     * Vérifie si l'utilisateur est un administrateur.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Vérifie si l'utilisateur est un employé standard.
+     */
+    public function isEmployee(): bool
+    {
+        return $this->role === 'employee' || $this->role === 'user';
     }
 }
