@@ -7,12 +7,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
     /**
-     * Affiche la page du profil (Vue personnalisée).
+     * Affiche la page du profil (Design Card).
      */
     public function show(Request $request): View
     {
@@ -22,7 +23,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Affiche le formulaire d'édition standard.
+     * Affiche le formulaire d'édition (Paramètres).
      */
     public function edit(Request $request): View
     {
@@ -33,22 +34,37 @@ class ProfileController extends Controller
 
     /**
      * Met à jour les informations du profil.
-     * Note : Assure-toi que ProfileUpdateRequest contient les nouveaux champs
-     * ou utilise la validation directe ci-dessous.
      */
     public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
 
-        // Validation des données (incluant tes nouveaux champs)
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'phone' => ['nullable', 'string', 'max:20'],
-            'gender' => ['nullable', 'string', 'in:Homme,Femme'],
+            'gender' => ['nullable', 'string'],
             'birth_date' => ['nullable', 'date'],
-            // On laisse l'admin gérer le poste et le département pour plus de sécurité
+            'address' => ['nullable', 'string', 'max:255'],
+            'family_status' => ['nullable', 'string'],
+            'cnps_number' => ['nullable', 'string'],
+            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
+            'emergency_contact_phone' => ['nullable', 'string', 'max:20'],
+            'emergency_contact_relation' => ['nullable', 'string', 'max:100'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
+
+        // Gestion de l'Upload de l'Avatar
+        if ($request->hasFile('avatar')) {
+            // Supprimer l'ancien avatar s'il existe pour ne pas encombrer le serveur
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            // Stocker le nouveau fichier dans storage/app/public/avatars
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $path;
+        }
 
         $user->fill($validated);
 
@@ -73,6 +89,10 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
 
         $user->delete();
 

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Ajout des colonnes pour le profil utilisateur
+            // Informations de base et professionnelles
+            $table->string('avatar')->nullable()->after('name');
             $table->string('employee_id')->nullable()->after('id'); 
             $table->string('phone')->nullable()->after('email');
             $table->string('department')->nullable(); 
@@ -21,6 +22,16 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->string('contract_type')->nullable(); 
             $table->date('hire_date')->nullable(); 
+
+            // Nouvelles informations personnelles (extraites des captures)
+            $table->string('address')->nullable();
+            $table->string('family_status')->nullable(); // Célibataire, Marié, etc.
+            $table->string('cnps_number')->nullable();
+
+            // Contact d'urgence
+            $table->string('emergency_contact_name')->nullable();
+            $table->string('emergency_contact_phone')->nullable();
+            $table->string('emergency_contact_relation')->nullable();
         });
     }
 
@@ -30,8 +41,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Suppression des colonnes en cas de rollback
             $table->dropColumn([
+                'avatar',
                 'employee_id', 
                 'phone', 
                 'department', 
@@ -39,7 +50,13 @@ return new class extends Migration
                 'gender', 
                 'birth_date', 
                 'contract_type', 
-                'hire_date'
+                'hire_date',
+                'address',
+                'family_status',
+                'cnps_number',
+                'emergency_contact_name',
+                'emergency_contact_phone',
+                'emergency_contact_relation'
             ]);
         });
     }
