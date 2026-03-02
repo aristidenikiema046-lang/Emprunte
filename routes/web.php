@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     
     // --- Profil ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    @patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // --- Présences ---
@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.progress');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy'); // <--- AJOUTÉ : Résout l'erreur RouteNotFound
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
     // --- Congés ---
     Route::get('/leaves', [LeaveController::class, 'index'])->name('leaves.index');
