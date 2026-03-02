@@ -24,7 +24,7 @@
                     <tbody class="divide-y divide-slate-700 text-sm">
                         @foreach($leaves as $leave)
                         <tr class="hover:bg-slate-700/30 transition">
-                            <td class="px-6 py-4 font-bold text-indigo-400">{{ $leave->user->name }}</td>
+                            <td class="px-6 py-4 font-bold text-indigo-400">{{ $leave->user?->name ?? 'Utilisateur supprimé' }}</td>
                             <td class="px-6 py-4">{{ $leave->type }}</td>
                             <td class="px-6 py-4">Du {{ $leave->start_date }} au {{ $leave->end_date }}</td>
                             <td class="px-6 py-4 italic text-slate-400">"{{ $leave->reason }}"</td>

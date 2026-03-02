@@ -27,6 +27,8 @@ class Leave extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Utilisateur supprimé',
+        ]);
     }
 }
