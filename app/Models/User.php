@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -22,8 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'avatar',                  // Photo de profil
-        'employee_id',             // ID Employé (ex: EMP20260002)
+        'avatar',                    // Photo de profil
+        'employee_id',              // ID Employé (ex: EMP20260002)
         'phone',
         'department',
         'post',
@@ -31,11 +32,11 @@ class User extends Authenticatable
         'birth_date',
         'contract_type',
         'hire_date',
-        'address',                 // Adresse
-        'family_status',           // Situation familiale (ex: Célibataire)
-        'cnps_number',             // Numéro CNPS
-        'emergency_contact_name',  // Nom contact urgence
-        'emergency_contact_phone', // Tel contact urgence
+        'address',                  // Adresse
+        'family_status',            // Situation familiale (ex: Célibataire)
+        'cnps_number',              // Numéro CNPS
+        'emergency_contact_name',   // Nom contact urgence
+        'emergency_contact_phone',  // Tel contact urgence
         'emergency_contact_relation', // Lien de parenté (ex: Épouse, Frère)
     ];
 
@@ -62,5 +63,21 @@ class User extends Authenticatable
             'birth_date' => 'date',
             'hire_date' => 'date',
         ];
+    }
+
+    /**
+     * Relation avec les tâches (Correction de l'erreur BadMethodCallException)
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    /**
+     * Relation avec les congés (Vu sur ton interface Dashboard)
+     */
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
     }
 }
