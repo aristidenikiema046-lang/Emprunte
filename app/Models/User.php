@@ -66,7 +66,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les tâches (Correction de l'erreur BadMethodCallException)
+     * Relation avec les tâches
      */
     public function tasks(): HasMany
     {
@@ -74,10 +74,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les congés (Vu sur ton interface Dashboard)
+     * Relation avec les congés
      */
     public function leaves(): HasMany
     {
         return $this->hasMany(Leave::class);
+    }
+
+    /**
+     * Relation avec les présences (Correction de l'erreur actuelle)
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
     }
 }
