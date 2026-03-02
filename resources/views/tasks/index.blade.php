@@ -20,7 +20,7 @@
             </div>
 
             {{-- Assignation Admin --}}
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->role === 'admin')
             <div class="bg-[#1e293b] p-6 rounded-[2rem] border border-slate-700 shadow-2xl mb-10">
                 <form action="{{ route('tasks.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @csrf
@@ -50,18 +50,21 @@
                 <div class="bg-[#1e293b] p-5 rounded-3xl border border-slate-800 transition-all hover:border-slate-700 shadow-xl">
                     <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
                         
-                        {{-- Infos Mission --}}
+                        {{-- Infos Mission (CORRIGÉ ICI) --}}
                         <div class="flex items-center gap-5 w-full lg:w-1/3">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center border {{ $task->is_completed ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-500' }}">
                                 @if($task->is_completed)
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    <i class="fa-solid fa-check text-lg"></i>
                                 @else
-                                    <span class="font-black text-xs">{{ $task->progress }}%</span>
+                                    <span class="font-black text-xs">{{ $task->progress ?? 0 }}%</span>
                                 @endif
                             </div>
                             <div>
                                 <h3 class="font-bold text-sm {{ $task->is_completed ? 'text-slate-500 line-through' : 'text-white' }}">{{ $task->title }}</h3>
-                                <span class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">{{ $task->user->name }}</span>
+                                {{-- Utilisation de ?-> pour éviter l'erreur si l'user est nul --}}
+                                <span class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">
+                                    {{ $task->user?->name ?? 'Ancien membre' }}
+                                </span>
                             </div>
                         </div>
 
@@ -74,22 +77,22 @@
                                             <form action="{{ route('tasks.progress', $task) }}" method="POST" class="flex-1">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="progress" value="{{ $step }}">
-                                                <button type="submit" class="w-full py-1.5 rounded-lg border {{ $task->progress == $step ? 'bg-indigo-600 border-indigo-500' : 'bg-[#0f172a] border-slate-700 text-slate-500 hover:text-white' }} text-[9px] font-black transition-all">
+                                                <button type="submit" class="w-full py-1.5 rounded-lg border {{ ($task->progress ?? 0) == $step ? 'bg-indigo-600 border-indigo-500' : 'bg-[#0f172a] border-slate-700 text-slate-500 hover:text-white' }} text-[9px] font-black transition-all">
                                                     {{ $step }}%
                                                 </button>
                                             </form>
                                         @endforeach
                                     </div>
                                     <div class="h-1.5 w-full bg-[#0f172a] rounded-full overflow-hidden border border-slate-800">
-                                        <div class="h-full bg-indigo-500 transition-all duration-500" style="width: {{ $task->progress }}%"></div>
+                                        <div class="h-full bg-indigo-500 transition-all duration-500" style="width: {{ $task->progress ?? 0 }}%"></div>
                                     </div>
                                 </div>
                             @else
                                 <div class="space-y-1.5 text-right">
                                     <div class="h-2 w-full bg-[#0f172a] rounded-full overflow-hidden border border-slate-800 shadow-inner">
-                                        <div class="h-full transition-all duration-700 {{ $task->progress < 40 ? 'bg-red-500' : ($task->progress < 80 ? 'bg-orange-500' : 'bg-emerald-500') }}" style="width: {{ $task->progress }}%"></div>
+                                        <div class="h-full transition-all duration-700 {{ ($task->progress ?? 0) < 40 ? 'bg-red-500' : (($task->progress ?? 0) < 80 ? 'bg-orange-500' : 'bg-emerald-500') }}" style="width: {{ $task->progress ?? 0 }}%"></div>
                                     </div>
-                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest">{{ $task->is_completed ? 'Terminé' : 'En cours ('.$task->progress.'%)' }}</span>
+                                    <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest">{{ $task->is_completed ? 'Terminé' : 'En cours ('.($task->progress ?? 0).'%)' }}</span>
                                 </div>
                             @endif
                         </div>
@@ -102,6 +105,16 @@
                                     {{ $task->is_completed ? 'Rouvrir' : 'Terminer' }}
                                 </button>
                             </form>
+
+                            {{-- Option de suppression pour l'Admin --}}
+                            @if(auth()->user()->role === 'admin')
+                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Supprimer cette mission ?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="p-2 text-slate-500 hover:text-red-500 transition-colors">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
