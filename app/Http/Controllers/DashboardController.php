@@ -13,39 +13,36 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Sécurité : Seul l'admin accède à cette vue
-        if (auth()->user()->role !== 'admin') {
-            return redirect()->route('tasks.index'); 
-        }
-
+        $user = auth()->user();
         $today = Carbon::today();
 
-        // 1. Statistiques (Corrigé : on utilise la colonne 'date')
-        $attendanceToday = Attendance::whereDate('date', $today)->count();
-        $totalUsers = User::where('role', '!=', 'admin')->count();
-        $pendingLeaves = Leave::where('status', 'pending')->count();
+        // --- LOGIQUE ADMIN ---
+        if ($user->role === 'admin') {
+            $attendanceToday = Attendance::whereDate('date', $today)->count();
+            $totalUsers = User::where('role', '!=', 'admin')->count();
+            $pendingLeaves = Leave::where('status', 'pending')->count();
+            $totalTasks = Task::count();
+            $globalPerformance = $totalTasks > 0 ? round(Task::avg('progress')) : 0;
+            $recentMissions = Task::with('user')->latest('updated_at')->take(5)->get();
+            $users = User::where('role', '!=', 'admin')
+                ->with(['attendances' => function($query) use ($today) {
+                    $query->whereDate('date', $today);
+                }])->get();
 
-        // 2. Performance basée sur le % de progression moyen
-        $totalTasks = Task::count();
-        $globalPerformance = $totalTasks > 0 ? round(Task::avg('progress')) : 0;
+            return view('admin.dashboard', compact(
+                'totalUsers', 'pendingLeaves', 'attendanceToday', 
+                'globalPerformance', 'recentMissions', 'users'
+            ));
+        }
 
-        // 3. Flux d'activité
-        $recentMissions = Task::with('user')
-            ->latest('updated_at')
-            ->take(5)
-            ->get();
+        // --- LOGIQUE UTILISATEUR (Collaborateur) ---
+        // On récupère les variables individuelles pour correspondre au fichier Blade
+        $myTasks = $user->tasks()->where('is_completed', false)->get();
+        $myProgress = round($user->tasks()->avg('progress') ?? 0);
+        $myAttendanceToday = $user->attendances()->whereDate('date', $today)->first();
+        $myPendingLeavesCount = $user->leaves()->where('status', 'pending')->count();
 
-        // 4. Liste des utilisateurs pour le formulaire ET le Live Status
-        // Corrigé : On filtre sur la colonne 'date'
-        $users = User::where('role', '!=', 'admin')
-            ->with(['attendances' => function($query) use ($today) {
-                $query->whereDate('date', $today);
-            }])
-            ->get();
-
-        return view('admin.dashboard', compact(
-            'totalUsers', 'pendingLeaves', 'attendanceToday', 
-            'globalPerformance', 'recentMissions', 'users'
-        ));
+        // On pointe vers le dossier "user" (vérifiez si votre dossier est 'user' ou 'users')
+        return view('users.dashboard', compact('myTasks', 'myProgress', 'myAttendanceToday', 'myPendingLeavesCount'));
     }
 }
