@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Attendance extends Model
 {
@@ -19,10 +20,6 @@ class Attendance extends Model
         'is_completed'
     ];
 
-    /**
-     * Le cast permet de transformer automatiquement les colonnes en objets Carbon.
-     * C'est indispensable pour gérer les colonnes de type 'timestamp'.
-     */
     protected $casts = [
         'date' => 'date',
         'check_in_8h30' => 'datetime',
@@ -31,6 +28,20 @@ class Attendance extends Model
         'check_out_17h00' => 'datetime',
         'is_completed' => 'boolean',
     ];
+
+    // Calcul du retard à l'arrivée
+    public function getRetardMinutesAttribute()
+    {
+        if (!$this->check_in_8h30) return 0;
+        
+        $heureTheorique = Carbon::parse($this->date)->setTime(8, 30);
+        $heureReelle = $this->check_in_8h30;
+
+        if ($heureReelle->gt($heureTheorique->addMinutes(5))) {
+            return $heureReelle->diffInMinutes($heureTheorique);
+        }
+        return 0;
+    }
 
     public function user()
     {
