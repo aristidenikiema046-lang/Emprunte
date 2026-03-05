@@ -1,141 +1,121 @@
 <x-app-layout>
-    <div class="py-6 bg-[#0f172a] min-h-screen text-white">
+    <div class="py-6 bg-[#020617] min-h-screen text-white">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <h2 class="text-3xl font-black uppercase tracking-widest mb-10 text-center lg:text-left">
+            <h2 class="text-3xl font-black uppercase tracking-tighter mb-10 flex items-center gap-4">
+                <span class="w-2 h-10 bg-blue-600 rounded-full"></span>
                 Performance <span class="text-blue-500">& Évaluations</span>
             </h2>
 
+            {{-- Stats Cards --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-slate-900/80 p-6 rounded-[2rem] border border-slate-800 shadow-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Moyenne {{ auth()->user()->role === 'admin' ? 'Entreprise' : 'Personnelle' }}</p>
-                        <h3 class="text-4xl font-black text-blue-500">{{ number_format($globalAverage, 2) }} <span class="text-lg text-slate-600">/ 9</span></h3>
-                    </div>
-                    <div class="h-14 w-14 bg-blue-500/10 rounded-2xl flex items-center justify-center">
-                        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Moyenne {{ auth()->user()->role === 'admin' ? 'Entreprise' : 'Personnelle' }}</p>
+                    <h3 class="text-4xl font-black text-blue-500 mt-2">{{ number_format($globalAverage, 2) }} <span class="text-lg text-gray-700">/ 9</span></h3>
+                </div>
+
+                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Taux de Performance</p>
+                    <h3 class="text-4xl font-black text-emerald-500">{{ number_format(($globalAverage / 9) * 100, 1) }}%</h3>
+                    <div class="w-full bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
+                        <div class="bg-emerald-500 h-full transition-all duration-1000" style="width: {{ ($globalAverage / 9) * 100 }}%"></div>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/80 p-6 rounded-[2rem] border border-slate-800 shadow-xl">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Taux de Performance</p>
-                    <div class="flex items-end justify-between">
-                        <h3 class="text-4xl font-black text-emerald-500">{{ number_format(($globalAverage / 9) * 100, 1) }}%</h3>
-                        <span class="text-[10px] text-slate-400 pb-1">Objectif: 100%</span>
-                    </div>
-                    <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
-                        <div class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: {{ ($globalAverage / 9) * 100 }}%"></div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/80 p-6 rounded-[2rem] border border-slate-800 shadow-xl flex items-center justify-between">
+                <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-white/5 shadow-2xl flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Évaluations</p>
-                        <h3 class="text-4xl font-black text-white">{{ $totalEvals }}</h3>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Évaluations</p>
+                        <h3 class="text-4xl font-black text-white mt-2">{{ $totalEvals }}</h3>
                     </div>
-                    <div class="h-14 w-14 bg-slate-800 rounded-2xl flex items-center justify-center">
-                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
+                    <i class="fa-solid fa-file-signature text-3xl text-gray-800"></i>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                {{-- SECTION FORMULAIRE --}}
+                {{-- FORMULAIRE AUTOMATISÉ (ADMIN SEULEMENT) --}}
                 @if(auth()->user()->role === 'admin')
                 <div class="lg:col-span-5">
-                    <div class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-800 shadow-2xl sticky top-6">
-                        <h3 class="text-blue-400 font-black uppercase text-sm mb-8 flex items-center">
-                            <span class="w-8 h-px bg-blue-400 mr-3"></span> Noter un collaborateur
-                        </h3>
+                    <div class="bg-gray-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl sticky top-6">
+                        <h3 class="text-blue-500 font-black uppercase text-xs mb-8 tracking-widest">Nouvelle Évaluation Auto</h3>
 
                         <form action="{{ route('evaluations.store') }}" method="POST" class="space-y-6">
                             @csrf
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-2">Collaborateur</label>
-                                <select name="user_id" class="w-full bg-slate-800 border-none rounded-2xl text-sm py-4 focus:ring-2 focus:ring-blue-500 transition-all text-white" required>
-                                    <option value="">Choisir un membre de l'équipe</option>
+                            <div>
+                                <label class="text-[10px] font-black text-gray-500 uppercase ml-2">Collaborateur</label>
+                                <select name="user_id" class="w-full bg-slate-950 border-none rounded-2xl text-sm py-4 mt-2 text-white focus:ring-2 focus:ring-blue-600" required>
+                                    <option value="">Sélectionner...</option>
                                     @foreach($users as $u) <option value="{{ $u->id }}">{{ $u->name }}</option> @endforeach
                                 </select>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Résolution (max 2)</label>
-                                    <input type="number" step="0.25" min="0" max="2" name="problem_solving" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
+                            @php
+                                $criteres = [
+                                    'problem_solving' => 'Résolution de problèmes',
+                                    'reporting' => 'Qualité du Reporting',
+                                    'pressure_management' => 'Gestion de la pression',
+                                    'communication' => 'Communication',
+                                    'schedule_respect' => 'Respect des horaires',
+                                    'rules_respect' => 'Respect des règles',
+                                ];
+                            @endphp
+
+                            <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                @foreach($criteres as $key => $label)
+                                <div class="p-4 bg-slate-950/50 rounded-2xl border border-white/5">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-3 block">{{ $label }}</label>
+                                    <div class="grid grid-cols-4 gap-2">
+                                        @foreach([1 => 'INS', 2 => 'MOY', 3 => 'BIEN', 4 => 'EXC'] as $val => $text)
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="{{ $key }}" value="{{ $val }}" class="hidden peer" required>
+                                            <div class="text-[9px] text-center p-2 rounded-xl bg-gray-900 text-gray-600 border border-white/5 peer-checked:bg-blue-600 peer-checked:text-white transition-all font-black">
+                                                {{ $text }}
+                                            </div>
+                                        </label>
+                                        @endforeach
+                                    </div>
                                 </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Objectifs (max 0.5)</label>
-                                    <input type="number" step="0.05" min="0" max="0.5" name="goals_respect" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Sous Pression (max 1)</label>
-                                    <input type="number" step="0.25" min="0" max="1" name="pressure_management" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Implication (max 0.5)</label>
-                                    <input type="number" step="0.05" min="0" max="0.5" name="implication" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Règles (max 1)</label>
-                                    <input type="number" step="0.25" min="0" max="1" name="rules_respect" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Horaires (max 0.75)</label>
-                                    <input type="number" step="0.05" min="0" max="0.75" name="schedule_respect" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Présence (max 0.25)</label>
-                                    <input type="number" step="0.05" min="0" max="0.25" name="presence" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Collaboration (max 0.25)</label>
-                                    <input type="number" step="0.05" min="0" max="0.25" name="collaboration" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Comm. (max 0.75)</label>
-                                    <input type="number" step="0.05" min="0" max="0.75" name="communication" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Reporting (max 2)</label>
-                                    <input type="number" step="0.25" min="0" max="2" name="reporting" class="w-full bg-slate-800 border-none rounded-xl text-sm text-white" required>
-                                </div>
+                                @endforeach
+                                {{-- Champs cachés avec valeurs par défaut pour les petits critères --}}
+                                <input type="hidden" name="goals_respect" value="3">
+                                <input type="hidden" name="implication" value="3">
+                                <input type="hidden" name="presence" value="4">
+                                <input type="hidden" name="collaboration" value="3">
                             </div>
 
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-blue-600/20 transition-all mt-4">
-                                Valider l'évaluation
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-600/20 transition-all">
+                                Calculer & Enregistrer
                             </button>
                         </form>
                     </div>
                 </div>
                 @endif
 
-                {{-- SECTION HISTORIQUE --}}
+                {{-- HISTORIQUE --}}
                 <div class="{{ auth()->user()->role === 'admin' ? 'lg:col-span-7' : 'lg:col-span-12' }}">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
                         @forelse($evaluations as $eval)
-                        <div class="bg-slate-900 p-6 rounded-[2rem] border-l-4 border-blue-500 shadow-xl group hover:bg-slate-800 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">{{ $eval->created_at->format('d M Y') }}</p>
-                                    <h4 class="font-black text-xl text-white group-hover:text-blue-400 transition-colors">{{ $eval->user->name }}</h4>
+                        <div class="bg-gray-900 p-6 rounded-[2.5rem] border border-white/5 hover:border-blue-500/30 transition-all shadow-xl">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500 font-black">
+                                        {{ substr($eval->user->name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-white uppercase text-sm">{{ $eval->user->name }}</h4>
+                                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{{ $eval->created_at->translatedFormat('d F Y') }}</p>
+                                    </div>
                                 </div>
-                                <div class="bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700">
-                                    <span class="text-2xl font-black text-blue-500">{{ number_format($eval->total_score, 2) }}</span>
-                                    <span class="text-[10px] text-slate-500">/ 9</span>
+                                <div class="text-right">
+                                    <span class="text-2xl font-black text-white">{{ number_format($eval->total_score, 2) }}</span>
+                                    <span class="text-[10px] text-gray-600 font-bold">/ 9</span>
                                 </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-y-2 gap-x-4 pt-4 border-t border-slate-800">
-                                <div class="flex justify-between items-center"><span class="text-[9px] text-slate-500 uppercase">Résolution:</span><span class="text-xs font-bold text-white">{{ $eval->problem_solving }}</span></div>
-                                <div class="flex justify-between items-center"><span class="text-[9px] text-slate-500 uppercase">Reporting:</span><span class="text-xs font-bold text-white">{{ $eval->reporting }}</span></div>
-                                <div class="flex justify-between items-center"><span class="text-[9px] text-slate-500 uppercase">Objectifs:</span><span class="text-xs font-bold text-white">{{ $eval->goals_respect }}</span></div>
-                                <div class="flex justify-between items-center"><span class="text-[9px] text-slate-500 uppercase">Comm:</span><span class="text-xs font-bold text-white">{{ $eval->communication }}</span></div>
                             </div>
                         </div>
                         @empty
-                        <div class="col-span-full p-12 text-center bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-800">
-                            <p class="text-slate-500 font-medium italic">Aucune évaluation enregistrée pour le moment.</p>
+                        <div class="text-center p-20 bg-gray-900 rounded-[3rem] border border-dashed border-white/5">
+                            <i class="fa-solid fa-inbox text-4xl text-gray-800 mb-4"></i>
+                            <p class="text-gray-600 font-bold uppercase text-xs tracking-widest">Aucune donnée disponible</p>
                         </div>
                         @endforelse
                     </div>

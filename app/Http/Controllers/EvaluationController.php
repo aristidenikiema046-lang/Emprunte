@@ -12,7 +12,6 @@ class EvaluationController extends Controller
     {
         $user = auth()->user();
         
-        // Calcul des statistiques globales
         if ($user->role === 'admin') {
             $evaluations = Evaluation::with('user')->latest()->get();
             $users = User::where('role', '!=', 'admin')->get();
@@ -30,25 +29,46 @@ class EvaluationController extends Controller
 
     public function store(Request $request)
     {
+        // On valide des paliers (1=Insuffisant, 2=Moyen, 3=Bien, 4=Excellent)
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'problem_solving' => 'required|numeric|min:0|max:2',
-            'goals_respect' => 'required|numeric|min:0|max:0.5',
-            'pressure_management' => 'required|numeric|min:0|max:1',
-            'implication' => 'required|numeric|min:0|max:0.5',
-            'rules_respect' => 'required|numeric|min:0|max:1',
-            'schedule_respect' => 'required|numeric|min:0|max:0.75',
-            'presence' => 'required|numeric|min:0|max:0.25',
-            'collaboration' => 'required|numeric|min:0|max:0.25',
-            'communication' => 'required|numeric|min:0|max:0.75',
-            'reporting' => 'required|numeric|min:0|max:2',
+            'problem_solving' => 'required|integer|between:1,4',
+            'goals_respect' => 'required|integer|between:1,4',
+            'pressure_management' => 'required|integer|between:1,4',
+            'implication' => 'required|integer|between:1,4',
+            'rules_respect' => 'required|integer|between:1,4',
+            'schedule_respect' => 'required|integer|between:1,4',
+            'presence' => 'required|integer|between:1,4',
+            'collaboration' => 'required|integer|between:1,4',
+            'communication' => 'required|integer|between:1,4',
+            'reporting' => 'required|integer|between:1,4',
         ]);
 
-        // Calcul du total (Somme des notes du tableau $data après l'ID utilisateur)
-        $total = array_sum(array_slice($data, 1));
+        // AUTOMATISATION : Coefficients basés sur tes maxima (Total 9)
+        $weights = [
+            'problem_solving' => 2 / 4,
+            'goals_respect' => 0.5 / 4,
+            'pressure_management' => 1 / 4,
+            'implication' => 0.5 / 4,
+            'rules_respect' => 1 / 4,
+            'schedule_respect' => 0.75 / 4,
+            'presence' => 0.25 / 4,
+            'collaboration' => 0.25 / 4,
+            'communication' => 0.75 / 4,
+            'reporting' => 2 / 4,
+        ];
 
-        Evaluation::create(array_merge($data, ['total_score' => $total]));
+        $finalScores = ['user_id' => $request->user_id];
+        $total = 0;
 
-        return back()->with('success', 'Évaluation enregistrée avec succès ! Note : ' . number_format($total, 2) . '/9');
+        foreach ($weights as $criterion => $factor) {
+            $scoreValue = $request->$criterion * $factor;
+            $finalScores[$criterion] = $scoreValue;
+            $total += $scoreValue;
+        }
+
+        Evaluation::create(array_merge($finalScores, ['total_score' => $total]));
+
+        return back()->with('success', 'Évaluation générée avec succès ! Note : ' . number_format($total, 2) . '/9');
     }
 }
