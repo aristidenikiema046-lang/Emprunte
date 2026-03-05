@@ -1,28 +1,32 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
+    {{-- Header de la page --}}
+    <div class="mb-8">
+        <h2 class="font-black text-3xl text-white uppercase tracking-tighter flex items-center gap-4">
+            <span class="w-2 h-10 bg-blue-600 rounded-full"></span>
+            {{ __('Paramètres du Compte') }}
         </h2>
-    </x-slot>
+        <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-2 ml-6">Gérez vos informations personnelles et la sécurité</p>
+    </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+    <div class="space-y-8">
+        {{-- Section 1 : Informations du Profil --}}
+        <div class="p-8 sm:p-10 shadow-2xl rounded-[3rem] border border-white/5 transition-all hover:border-blue-500/20" style="background-color: #111827;">
+            <div class="max-w-2xl">
+                @include('profile.partials.update-profile-information-form')
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
+        {{-- Section 2 : Mot de passe --}}
+        <div class="p-8 sm:p-10 shadow-2xl rounded-[3rem] border border-white/5 transition-all hover:border-blue-500/20" style="background-color: #111827;">
+            <div class="max-w-2xl">
+                @include('profile.partials.update-password-form')
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
+        {{-- Section 3 : Danger Zone (Suppression) --}}
+        <div class="p-8 sm:p-10 shadow-2xl rounded-[3rem] border border-red-500/10 transition-all hover:border-red-500/20" style="background-color: #111827;">
+            <div class="max-w-2xl">
+                @include('profile.partials.delete-user-form')
             </div>
         </div>
     </div>
