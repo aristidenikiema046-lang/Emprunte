@@ -1,140 +1,76 @@
-<div class="max-w-6xl mx-auto">
-    <section class="bg-[#111827] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5">
-        
-        {{-- Header Style "Performance" --}}
-        <div class="bg-[#1e293b]/30 p-8 border-b border-white/5 flex justify-between items-center">
-            <div>
-                <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Configuration <span class="text-blue-500">Profil</span></h2>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="h-1 w-8 bg-teal-500 rounded-full"></span>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em]">Édition des données sécurisées</p>
-                </div>
+<section>
+    <header>
+        <h2 class="text-lg font-bold text-white uppercase tracking-widest">
+            {{ __('Informations du Profil') }}
+        </h2>
+        <p class="mt-1 text-sm text-gray-400 italic">
+            {{ __("Mettez à jour vos informations personnelles et votre photo de profil.") }}
+        </p>
+    </header>
+
+    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
+        @csrf
+    </form>
+
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
+        @csrf
+        @method('patch')
+
+        {{-- Section Avatar Dark --}}
+        <div class="flex items-center gap-6 p-6 rounded-[2rem] border border-white/5 shadow-inner" style="background-color: #0b0f1a;">
+            <div class="relative">
+                <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name) }}" 
+                     class="w-24 h-24 rounded-3xl object-cover border-2 border-blue-500 shadow-lg">
             </div>
-            <div class="bg-teal-500/10 border border-teal-500/20 px-4 py-2 rounded-2xl">
-                <i class="fa-solid fa-user-gear text-teal-400 text-sm"></i>
+            <div class="flex-1">
+                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Photo de profil</label>
+                <input type="file" name="avatar" class="block w-full text-xs text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-[10px] file:font-black file:uppercase
+                    file:bg-blue-600 file:text-white
+                    hover:file:bg-blue-700 transition-all cursor-pointer">
             </div>
         </div>
 
-        <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="p-8 space-y-10">
-            @csrf
-            @method('patch')
-
-            {{-- Zone Avatar Modernisée --}}
-            <div class="flex flex-col md:flex-row items-center gap-8 bg-[#0b0f1a]/50 p-6 rounded-[2rem] border border-white/5 shadow-inner">
-                <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-blue-600 rounded-[2.5rem] blur opacity-25"></div>
-                    <div class="relative w-32 h-32">
-                        <img id="preview" 
-                             src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=14b8a6&color=fff' }}" 
-                             class="w-full h-full rounded-[2.2rem] object-cover border-4 border-[#111827] shadow-2xl">
-                        <label for="avatar" class="absolute -bottom-2 -right-2 bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-2xl shadow-xl cursor-pointer hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-camera text-sm"></i>
-                        </label>
-                    </div>
-                    <input type="file" name="avatar" id="avatar" class="hidden" onchange="previewImage(event)"/>
-                </div>
-                <div class="text-center md:text-left">
-                    <h3 class="text-xl font-black text-white uppercase tracking-tight">{{ $user->name }}</h3>
-                    <p class="text-gray-500 text-xs font-bold mb-3 uppercase tracking-widest">{{ $user->email }}</p>
-                    <span class="px-4 py-1.5 bg-teal-500/10 text-teal-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-full border border-teal-500/20">
-                        Collaborateur Actif
-                    </span>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- Nom --}}
+            <div>
+                <x-input-label for="name" :value="__('Nom complet')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
+                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600" :value="old('name', $user->name)" required autofocus />
+                <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
-            {{-- Grille de Formulaire --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                
-                {{-- Identité --}}
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Identité Complète</label>
-                    <input name="name" type="text" value="{{ old('name', $user->name) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner focus:ring-2 focus:ring-teal-500/20 transition-all" required>
-                </div>
-
-                {{-- Email --}}
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Adresse Email</label>
-                    <input name="email" type="email" value="{{ old('email', $user->email) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner focus:ring-2 focus:ring-teal-500/20 transition-all" required>
-                </div>
-
-                {{-- Téléphone --}}
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Contact Téléphonique</label>
-                    <input name="phone" type="text" value="{{ old('phone', $user->phone) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner focus:ring-2 focus:ring-teal-500/20 transition-all">
-                </div>
-
-                {{-- Genre --}}
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Genre</label>
-                    <select name="gender" class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner focus:ring-2 focus:ring-teal-500/20 transition-all appearance-none cursor-pointer">
-                        <option value="Homme" {{ old('gender', $user->gender) == 'Homme' ? 'selected' : '' }}>Homme</option>
-                        <option value="Femme" {{ old('gender', $user->gender) == 'Femme' ? 'selected' : '' }}>Femme</option>
-                    </select>
-                </div>
-
-                {{-- Adresse --}}
-                <div class="md:col-span-2 space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Adresse Résidentielle</label>
-                    <input name="address" type="text" value="{{ old('address', $user->address) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner focus:ring-2 focus:ring-teal-500/20 transition-all">
-                </div>
+            {{-- Email --}}
+            <div>
+                <x-input-label for="email" :value="__('Email')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('email', $user->email)" required />
+                <x-input-error class="mt-2" :messages="$errors->get('email')" />
             </div>
 
-            {{-- Séparateur --}}
-            <div class="relative py-4">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/5"></div></div>
-                <div class="relative flex justify-start">
-                    <span class="bg-[#111827] pr-4 text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Urgence & Social</span>
-                </div>
+            {{-- Téléphone --}}
+            <div>
+                <x-input-label for="phone" :value="__('Téléphone')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
+                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('phone', $user->phone)" />
             </div>
 
-            {{-- Grille Sociale --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Situation Familiale</label>
-                    <input name="family_status" type="text" value="{{ old('family_status', $user->family_status) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-white font-bold shadow-inner transition-all">
-                </div>
-
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] ml-2">Numéro CNPS</label>
-                    <input name="cnps_number" type="text" value="{{ old('cnps_number', $user->cnps_number) }}" 
-                           class="w-full bg-[#0b0f1a] border-none rounded-2xl py-4 px-6 text-teal-400 font-black tracking-widest shadow-inner transition-all">
-                </div>
-
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-rose-400 uppercase tracking-[0.2em] ml-2">Contact Urgence (Nom)</label>
-                    <input name="emergency_contact_name" type="text" value="{{ old('emergency_contact_name', $user->emergency_contact_name) }}" 
-                           class="w-full bg-rose-500/5 border border-rose-500/10 rounded-2xl py-4 px-6 text-white font-bold shadow-inner transition-all">
-                </div>
-
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-rose-400 uppercase tracking-[0.2em] ml-2">Contact Urgence (Tel)</label>
-                    <input name="emergency_contact_phone" type="text" value="{{ old('emergency_contact_phone', $user->emergency_contact_phone) }}" 
-                           class="w-full bg-rose-500/5 border border-rose-500/10 rounded-2xl py-4 px-6 text-white font-bold shadow-inner transition-all">
-                </div>
+            {{-- Adresse --}}
+            <div class="md:col-span-2">
+                <x-input-label for="address" :value="__('Adresse de résidence')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
+                <x-text-input id="address" name="address" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('address', $user->address)" />
             </div>
+        </div>
 
-            {{-- Bouton --}}
-            <div class="pt-6">
-                <button type="submit" class="w-full py-5 bg-teal-500 hover:bg-teal-400 text-[#0f172a] font-black uppercase tracking-[0.3em] text-xs rounded-2xl shadow-xl shadow-teal-900/20 transition-all active:scale-95">
-                    <i class="fa-solid fa-floppy-disk mr-2"></i> Enregistrer les modifications
-                </button>
-            </div>
-        </form>
-    </section>
-</div>
+        <div class="flex items-center gap-4">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition shadow-lg shadow-blue-600/20">
+                {{ __('Enregistrer les changements') }}
+            </button>
 
-<script>
-    function previewImage(event) {
-        var reader = new FileReader();
-        reader.onload = function(){
-            var output = document.getElementById('preview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
+            @if (session('status') === 'profile-updated')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-emerald-500 font-bold italic">
+                    {{ __('Profil mis à jour avec succès.') }}
+                </p>
+            @endif
+        </div>
+    </form>
+</section>
