@@ -22,42 +22,42 @@
                         <i class="fa-solid fa-chart-pie mr-3 opacity-50"></i> Dashboard
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('attendances.index')" :active="request()->routeIs('attendances.index')">
+                    <x-nav-link-sidebar :href="route('attendances.index')" :active="request()->routeIs('attendances.*')">
                         <i class="fa-solid fa-clock mr-3 opacity-50"></i> Présences
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('tasks.index')" :active="request()->routeIs('tasks.index')">
+                    <x-nav-link-sidebar :href="route('tasks.index')" :active="request()->routeIs('tasks.*')">
                         <i class="fa-solid fa-list-check mr-3 opacity-50"></i> Tâches
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('leaves.index')" :active="request()->routeIs('leaves.index')">
+                    <x-nav-link-sidebar :href="route('leaves.index')" :active="request()->routeIs('leaves.*')">
                         <i class="fa-solid fa-calendar-day mr-3 opacity-50"></i> Congés
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('payroll.index')" :active="request()->routeIs('payroll.index')"> 
+                    <x-nav-link-sidebar :href="route('payroll.index')" :active="request()->routeIs('payroll.*')"> 
                         <i class="fa-solid fa-file-invoice-dollar mr-3 opacity-50"></i> Paie 
                     </x-nav-link-sidebar>
 
                     <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Administration</div>
-                    <x-nav-link-sidebar :href="route('users.index')" :active="request()->routeIs('users.index')">
+                    <x-nav-link-sidebar :href="route('users.index')" :active="request()->routeIs('users.*')">
                         <i class="fa-solid fa-users mr-3 opacity-50"></i> Utilisateurs
                     </x-nav-link-sidebar>
 
                     <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Outils</div>
                     
-                    <x-nav-link-sidebar :href="route('messages.index')" :active="request()->routeIs('messages.*')">
+                    <x-nav-link-sidebar :href="url('/messages')" :active="request()->is('messages*')">
                         <i class="fa-solid fa-envelope mr-3 opacity-50"></i> Messages
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                    <x-nav-link-sidebar :href="url('/documents')" :active="request()->is('documents*')">
                         <i class="fa-solid fa-folder-open mr-3 opacity-50"></i> Documents
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('polls.index')" :active="request()->routeIs('polls.*')">
+                    <x-nav-link-sidebar :href="url('/polls')" :active="request()->is('polls*')">
                         <i class="fa-solid fa-square-poll-vertical mr-3 opacity-50"></i> Sondages
                     </x-nav-link-sidebar>
 
-                    <x-nav-link-sidebar :href="route('evaluations.index')" :active="request()->routeIs('evaluations.*')">
+                    <x-nav-link-sidebar :href="url('/evaluations')" :active="request()->is('evaluations*')">
                         <i class="fa-solid fa-star mr-3 opacity-50"></i> Évaluations
                     </x-nav-link-sidebar>
                 </div>
