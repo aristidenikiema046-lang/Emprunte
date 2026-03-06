@@ -105,5 +105,9 @@
                 </main>
             </div>
         </div>
+        {{-- SYSTÈME DE NOTIFICATION UNIFIÉ --}}
+        @if(session('success') || session('error'))
+            <x-notification />
+        @endif
     </body>
 </html>

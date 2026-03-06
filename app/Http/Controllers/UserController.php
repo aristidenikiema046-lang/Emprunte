@@ -8,21 +8,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Affiche la liste des utilisateurs
-     */
     public function index()
     {
-        // On récupère tous les utilisateurs sauf l'admin connecté pour éviter les erreurs
-        // On trie par statut : les "En attente" (is_active = 0) apparaissent en premier
         $users = User::orderBy('is_active', 'asc')->get();
-        
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Création d'un utilisateur (via le bouton Ajouter un membre)
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -39,62 +30,49 @@ class UserController extends Controller
             'is_active' => true, 
         ]);
 
-        return redirect()->back()->with('success', 'Membre ajouté avec succès !');
+        return redirect()->back()->with('success', "Le nouveau collaborateur {$request->name} a été ajouté avec succès !");
     }
 
-    /**
-     * Gère l'activation et la suspension (Bouton ACCEPTER)
-     */
     public function toggleStatus(User $user)
     {
-        // Sécurité : ne pas se désactiver soi-même
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Action impossible sur votre propre compte.');
+            return redirect()->back()->with('error', 'Alerte : Vous ne pouvez pas suspendre votre propre compte administrateur.');
         }
 
-        // On bascule le statut
         $user->is_active = !$user->is_active;
         $user->save();
 
-        // Message personnalisé selon le nouvel état
         if ($user->is_active) {
-            $message = "L'accès de {$user->name} a été validé avec succès.";
-            // Note : L'envoi de mail sera ajouté ici plus tard
+            return redirect()->back()->with('success', "Accès autorisé : {$user->name} peut maintenant se connecter.");
         } else {
-            $message = "L'accès de {$user->name} a été suspendu.";
+            return redirect()->back()->with('error', "Accès révoqué : Le compte de {$user->name} est désormais suspendu.");
         }
-
-        return redirect()->back()->with('success', $message);
     }
 
-    /**
-     * Supprime définitivement un utilisateur
-     */
     public function destroy(User $user)
     {
-        // Sécurité : empêcher l'admin de supprimer son propre compte
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte administrateur.');
+            return redirect()->back()->with('error', 'Action interdite : Suppression de votre propre compte impossible.');
         }
 
         $userName = $user->name;
         $user->delete();
 
-        return redirect()->back()->with('success', "Le compte de $userName a été définitivement supprimé.");
+        return redirect()->back()->with('success', "Le profil de $userName a été définitivement retiré du système.");
     }
 
-    /**
-     * Change le rôle d'un utilisateur
-     */
     public function updateRole(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Vous ne pouvez pas modifier votre propre rôle.');
+            return redirect()->back()->with('error', 'Modification impossible : Vous ne pouvez pas changer votre propre rôle.');
         }
 
         $user->role = ($user->role === 'admin') ? 'user' : 'admin';
         $user->save();
 
-        return redirect()->back()->with('success', "Le rôle de {$user->name} est maintenant : {$user->role}.");
+        $statusType = $user->role === 'admin' ? 'success' : 'error';
+        $msg = "Mise à jour : {$user->name} est désormais enregistré comme {$user->role}.";
+
+        return redirect()->back()->with($statusType, $msg);
     }
 }

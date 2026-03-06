@@ -10,7 +10,6 @@ class TaskController extends Controller
 {
     public function index()
     {
-        // On récupère les utilisateurs pour le formulaire d'assignation
         $users = User::where('role', '!=', 'admin')->get();
 
         if (auth()->user()->isAdmin()) {
@@ -29,14 +28,14 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
         ]);
 
-        Task::create([
+        $task = Task::create([
             'user_id' => $request->user_id,
             'title' => $request->title,
             'progress' => 0,
             'is_completed' => false,
         ]);
 
-        return back()->with('success', 'Mission assignée avec succès !');
+        return back()->with('success', "Mission assignée à {$task->user->name} avec succès !");
     }
 
     public function updateProgress(Request $request, Task $task)
@@ -55,7 +54,11 @@ class TaskController extends Controller
             'completed_at' => ($request->progress == 100) ? now() : null,
         ]);
 
-        return back()->with('success', "Progression mise à jour à {$request->progress}%");
+        $msg = $request->progress == 100 
+            ? "Félicitations ! Mission terminée." 
+            : "Progression enregistrée : {$request->progress}% effectués.";
+
+        return back()->with('success', $msg);
     }
 
     public function toggle(Task $task)
@@ -65,26 +68,22 @@ class TaskController extends Controller
         }
 
         $newStatus = !$task->is_completed;
-
         $task->update([
             'is_completed' => $newStatus,
             'progress' => $newStatus ? 100 : 0,
             'completed_at' => $newStatus ? now() : null
         ]);
 
-        return back()->with('success', 'Statut modifié.');
+        return back()->with('success', $newStatus ? "Mission marquée comme terminée." : "Mission remise en cours.");
     }
 
-    // --- AJOUTÉ : Fonction de suppression ---
     public function destroy(Task $task)
     {
-        // Seul l'admin peut supprimer une tâche
         if (!auth()->user()->isAdmin()) {
             abort(403);
         }
 
         $task->delete();
-
-        return back()->with('success', 'La mission a été supprimée.');
+        return back()->with('error', 'La mission a été supprimée de la liste.');
     }
 }

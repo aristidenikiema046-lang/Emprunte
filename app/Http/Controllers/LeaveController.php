@@ -9,13 +9,11 @@ class LeaveController extends Controller
 {
     public function index()
     {
-        // Si l'utilisateur est admin, il voit TOUTES les demandes
         if (auth()->user()->isAdmin()) {
             $leaves = Leave::with('user')->latest()->get();
             return view('admin.leaves.index', compact('leaves'));
         }
 
-        // Si c'est un employé, il ne voit que les SIENNES
         $leaves = auth()->user()->leaves()->latest()->get();
         return view('leaves.index', compact('leaves'));
     }
@@ -38,7 +36,7 @@ class LeaveController extends Controller
             'status' => 'en_attente',
         ]);
 
-        return back()->with('success', 'Demande envoyée !');
+        return back()->with('success', 'Votre demande de congé a été transmise à l\'administration.');
     }
 
     public function updateStatus(Request $request, Leave $leave)
@@ -46,6 +44,10 @@ class LeaveController extends Controller
         $request->validate(['status' => 'required|in:approuvé,refusé']);
         $leave->update(['status' => $request->status]);
 
-        return back()->with('success', 'Statut mis à jour.');
+        if ($request->status === 'approuvé') {
+            return back()->with('success', "La demande de congé de {$leave->user->name} a été validée.");
+        } else {
+            return back()->with('error', "La demande de congé de {$leave->user->name} a été refusée.");
+        }
     }
 }
