@@ -29,7 +29,7 @@
                     {{ session('success') ? 'Succès Système' : 'Alerte Système' }}
                 </p>
                 <p class="text-xs font-bold text-slate-300 mt-1">
-                    {{ session('success') ?? session('error') }}
+                    {{ session('success') ?: session('error') }}
                 </p>
             </div>
 
