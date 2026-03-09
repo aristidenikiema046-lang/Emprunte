@@ -24,6 +24,13 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $this->autoPoint('check_out_17h00', 17, 0, true);
         })->dailyAt('17:15');
+
+        {
+        // On appelle notre commande tous les vendredis à 18h00
+        $schedule->command('evaluations:generate-weekly')
+                ->weeklyOn(5, '18:00')
+                ->timezone('Africa/Abidjan'); 
+        }
     }
 
     /**
