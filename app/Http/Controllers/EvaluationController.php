@@ -13,9 +13,6 @@ use Carbon\Carbon;
 
 class EvaluationController extends Controller
 {
-    /**
-     * Affiche la liste des évaluations.
-     */
     public function index()
     {
         $user = auth()->user();
@@ -33,9 +30,6 @@ class EvaluationController extends Controller
         return view('evaluations.index', compact('evaluations', 'users', 'globalAverage', 'totalEvals'));
     }
 
-    /**
-     * Génère une évaluation automatique (Audit de performance).
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -54,25 +48,26 @@ class EvaluationController extends Controller
             ->distinct()
             ->count();
         
-        if ($daysPresent >= 3) {
-            $attendanceScore = 4.0; 
-        } else {
-            $attendanceScore = ($daysPresent / 3) * 2; 
-        }
+        $attendanceScore = ($daysPresent >= 3) ? 4.0 : ($daysPresent / 3) * 4;
 
-        // --- 2. PERFORMANCE TÂCHES (SYNCHRONISÉ AVEC TASKCONTROLLER) ---
-        $tasksTotal = Task::where('user_id', $userId)->count();
-        // Correction ici : on utilise 'is_completed' au lieu de 'status'
-        $tasksDone = Task::where('user_id', $userId)->where('is_completed', true)->count(); 
+        // --- 2. PERFORMANCE TÂCHES (BASÉ SUR LA PROGRESSION RÉELLE) ---
+        $tasks = Task::where('user_id', $userId)->get();
+        $tasksCount = $tasks->count();
         
-        $taskRate = $tasksTotal > 0 ? ($tasksDone / $tasksTotal) * 4 : 2.0;
+        if ($tasksCount > 0) {
+            // On calcule la moyenne de progression (ex: une tâche à 50% = 0.5)
+            $averageProgress = $tasks->avg('progress') / 100; 
+            $taskRate = $averageProgress * 4; 
+        } else {
+            $taskRate = 2.0; // Neutre si aucune tâche
+        }
 
         // --- 3. ENGAGEMENT SONDAGES ---
         $totalPolls = Poll::count();
         $userVotes = DB::table('poll_votes')->where('user_id', $userId)->count(); 
         $engagementRate = $totalPolls > 0 ? ($userVotes / $totalPolls) * 4 : 2.0;
 
-        // --- 4. MAPPING DES CRITÈRES (Base 4) ---
+        // --- 4. MAPPING DES CRITÈRES ---
         $scores = [
             'user_id'             => $userId,
             'problem_solving'     => $taskRate,
@@ -87,7 +82,7 @@ class EvaluationController extends Controller
             'communication'       => 3.0,
         ];
 
-        // --- 5. CALCUL FINAL PONDÉRÉ (Note sur 9 points) ---
+        // --- 5. CALCUL FINAL PONDÉRÉ (Note sur 9) ---
         $weights = [
             'problem_solving'     => 2 / 4,    
             'reporting'           => 2 / 4,    
@@ -110,6 +105,6 @@ class EvaluationController extends Controller
             'total_score' => round($total, 2)
         ]));
 
-        return back()->with('success', "Audit généré avec succès. Note finale : " . number_format($total, 2) . "/9");
+        return back()->with('success', "Audit généré. Score basé sur la progression : " . number_format($total, 2) . "/9");
     }
 }

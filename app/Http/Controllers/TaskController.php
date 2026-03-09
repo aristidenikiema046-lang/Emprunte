@@ -12,7 +12,6 @@ class TaskController extends Controller
     {
         $users = User::where('role', '!=', 'admin')->get();
 
-        // Utilisation de la méthode role ou isAdmin() selon ton modèle User
         if (auth()->user()->role === 'admin') {
             $tasks = Task::with('user')->latest()->get();
         } else {
@@ -29,7 +28,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
         ]);
 
-        $task = Task::create([
+        Task::create([
             'user_id' => $request->user_id,
             'title' => $request->title,
             'progress' => 0,
@@ -41,9 +40,8 @@ class TaskController extends Controller
 
     public function updateProgress(Request $request, Task $task)
     {
-        // Seul le propriétaire peut mettre à jour sa progression
-        if ($task->user_id !== auth()->id()) {
-            abort(403);
+        if ($task->user_id != auth()->id()) {
+            abort(403, "Seul le collaborateur assigné peut modifier sa progression.");
         }
 
         $request->validate([
@@ -56,17 +54,12 @@ class TaskController extends Controller
             'completed_at' => ($request->progress == 100) ? now() : null,
         ]);
 
-        $msg = $request->progress == 100 
-            ? "Félicitations ! Mission terminée." 
-            : "Progression enregistrée : {$request->progress}% effectués.";
-
-        return back()->with('success', $msg);
+        return back()->with('success', "Progression mise à jour : {$request->progress}%");
     }
 
     public function toggle(Task $task)
     {
-        // Admin ou propriétaire peuvent clôturer
-        if ($task->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
+        if ($task->user_id != auth()->id() && auth()->user()->role !== 'admin') {
             abort(403);
         }
 
@@ -77,7 +70,7 @@ class TaskController extends Controller
             'completed_at' => $newStatus ? now() : null
         ]);
 
-        return back()->with('success', $newStatus ? "Mission terminée." : "Mission remise en cours.");
+        return back()->with('success', $newStatus ? "Mission clôturée." : "Mission réactivée.");
     }
 
     public function destroy(Task $task)
