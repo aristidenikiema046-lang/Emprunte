@@ -33,11 +33,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::post('/attendances/store', [AttendanceController::class, 'store'])->name('attendances.store');
 
-    // --- Tâches ---
+    // --- Tâches (Missions) ---
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
-    Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.progress');
+    // CORRECTION ICI : Le nom doit être tasks.updateProgress pour correspondre à la vue
+    Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.updateProgress');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
     // --- Congés ---
@@ -63,6 +64,7 @@ Route::middleware('auth')->group(function () {
 
     // --- Communication ---
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    // Optionnel : correction du nom pour la cohérence (messages.store)
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::patch('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
