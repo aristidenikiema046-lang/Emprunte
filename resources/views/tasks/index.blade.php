@@ -19,7 +19,7 @@
                         <i class="fa-solid fa-gauge-high text-blue-500"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] text-gray-500 font-black uppercase tracking-widest">Productivité</span>
+                        <span class="block text-[10px] text-gray-500 font-black uppercase tracking-widest">Productivité Globale</span>
                         <span class="text-2xl font-black text-white">
                             {{ $tasks->where('is_completed', true)->count() }} <span class="text-gray-700 text-lg">/</span> {{ $tasks->count() }}
                         </span>
@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            {{-- Assignation Admin - Style Glassmorphism --}}
+            {{-- Assignation Admin --}}
             @if(auth()->user()->role === 'admin')
             <div class="bg-gray-900 border border-gray-800 p-8 rounded-[2.5rem] shadow-2xl mb-12 relative overflow-hidden group">
                 <div class="absolute top-0 right-0 p-8 opacity-5">
@@ -52,7 +52,7 @@
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-500 uppercase ml-1">Intitulé de la mission</label>
-                        <input type="text" name="title" placeholder="Description courte..." class="w-full bg-gray-950 border-gray-800 rounded-xl text-white focus:border-blue-500 focus:ring-0 py-3.5 text-sm transition-all" required>
+                        <input type="text" name="title" placeholder="Que doit faire le collaborateur ?" class="w-full bg-gray-950 border-gray-800 rounded-xl text-white focus:border-blue-500 focus:ring-0 py-3.5 text-sm transition-all" required>
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-black text-xs uppercase transition-all shadow-lg shadow-blue-500/20 active:scale-95">
@@ -88,6 +88,9 @@
                                     <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
                                         {{ $task->user?->name ?? 'Ancien membre' }}
                                     </span>
+                                    @if($task->completed_at)
+                                        <span class="text-[9px] text-gray-600 italic">Terminé le {{ $task->completed_at->format('d/m à H:i') }}</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -101,7 +104,7 @@
                                     </div>
                                     <div class="flex gap-2">
                                         @foreach([25, 50, 75, 100] as $step)
-                                            <form action="{{ route('tasks.progress', $task) }}" method="POST" class="flex-1">
+                                            <form action="{{ route('tasks.updateProgress', $task) }}" method="POST" class="flex-1">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="progress" value="{{ $step }}">
                                                 <button type="submit" class="w-full py-2 rounded-xl border transition-all text-[10px] font-black {{ ($task->progress ?? 0) == $step ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-950 border-gray-800 text-gray-500 hover:text-white hover:border-gray-600' }}">
@@ -114,13 +117,13 @@
                             @else
                                 <div class="space-y-3">
                                     <div class="flex justify-between text-[9px] font-black uppercase tracking-widest mb-1">
-                                        <span class="text-gray-600">Status</span>
+                                        <span class="text-gray-600">Status actuel</span>
                                         <span class="{{ $task->is_completed ? 'text-emerald-500' : 'text-blue-500' }}">
                                             {{ $task->is_completed ? 'Mission accomplie' : 'En cours de déploiement' }}
                                         </span>
                                     </div>
                                     <div class="h-2.5 w-full bg-gray-950 rounded-full border border-gray-800 p-0.5 shadow-inner">
-                                        <div class="h-full rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.5)] {{ $task->is_completed ? 'bg-emerald-500' : 'bg-blue-600' }}" 
+                                        <div class="h-full rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.3)] {{ $task->is_completed ? 'bg-emerald-500 shadow-emerald-500/20' : 'bg-blue-600' }}" 
                                              style="width: {{ $task->progress ?? 0 }}%"></div>
                                     </div>
                                 </div>
@@ -129,6 +132,7 @@
 
                         {{-- Actions Rapides --}}
                         <div class="flex items-center gap-4">
+                            {{-- Bouton Toggle (Clôturer/Réactiver) --}}
                             <form action="{{ route('tasks.toggle', $task) }}" method="POST">
                                 @csrf @method('PATCH')
                                 <button type="submit" class="group/btn flex items-center gap-2 px-5 py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all {{ $task->is_completed ? 'border-gray-800 bg-gray-950 text-gray-400 hover:text-white hover:border-blue-500' : 'border-emerald-500/30 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white' }}">
@@ -137,8 +141,9 @@
                                 </button>
                             </form>
 
+                            {{-- Bouton Supprimer (Admin uniquement) --}}
                             @if(auth()->user()->role === 'admin')
-                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Confirmer la suppression définitive ?')">
+                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Supprimer définitivement cette mission ?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/5 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all">
                                         <i class="fa-solid fa-trash-can text-xs"></i>

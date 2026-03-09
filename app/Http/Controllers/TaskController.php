@@ -12,7 +12,8 @@ class TaskController extends Controller
     {
         $users = User::where('role', '!=', 'admin')->get();
 
-        if (auth()->user()->isAdmin()) {
+        // Utilisation de la méthode role ou isAdmin() selon ton modèle User
+        if (auth()->user()->role === 'admin') {
             $tasks = Task::with('user')->latest()->get();
         } else {
             $tasks = auth()->user()->tasks()->latest()->get();
@@ -35,17 +36,18 @@ class TaskController extends Controller
             'is_completed' => false,
         ]);
 
-        return back()->with('success', "Mission assignée à {$task->user->name} avec succès !");
+        return back()->with('success', "Mission assignée avec succès !");
     }
 
     public function updateProgress(Request $request, Task $task)
     {
+        // Seul le propriétaire peut mettre à jour sa progression
         if ($task->user_id !== auth()->id()) {
             abort(403);
         }
 
         $request->validate([
-            'progress' => 'required|integer|in:25,50,75,100',
+            'progress' => 'required|integer|min:0|max:100',
         ]);
 
         $task->update([
@@ -63,7 +65,8 @@ class TaskController extends Controller
 
     public function toggle(Task $task)
     {
-        if ($task->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+        // Admin ou propriétaire peuvent clôturer
+        if ($task->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
             abort(403);
         }
 
@@ -74,16 +77,16 @@ class TaskController extends Controller
             'completed_at' => $newStatus ? now() : null
         ]);
 
-        return back()->with('success', $newStatus ? "Mission marquée comme terminée." : "Mission remise en cours.");
+        return back()->with('success', $newStatus ? "Mission terminée." : "Mission remise en cours.");
     }
 
     public function destroy(Task $task)
     {
-        if (!auth()->user()->isAdmin()) {
+        if (auth()->user()->role !== 'admin') {
             abort(403);
         }
 
         $task->delete();
-        return back()->with('error', 'La mission a été supprimée de la liste.');
+        return back()->with('error', 'Mission supprimée.');
     }
 }
