@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class PollController extends Controller
 {
     /**
-     * Affiche la liste des sondages (Vue image_cffd7f.png)
+     * Affiche la liste des sondages.
      */
     public function index()
     {
@@ -19,19 +19,19 @@ class PollController extends Controller
     }
 
     /**
-     * Affiche le formulaire de création (Vue image_cffdc0.png)
+     * Affiche le formulaire de création de sondage (Admin uniquement).
      */
     public function create()
     {
-        // Seul l'admin peut accéder à cette page
-        if (!auth()->user()->isAdmin()) {
+        // Vérification de sécurité pour l'admin
+        if (auth()->user()->role !== 'admin') {
             abort(403, 'Action non autorisée.');
         }
         return view('polls.create');
     }
 
     /**
-     * Enregistre le nouveau sondage
+     * Enregistre un nouveau sondage dans la base de données.
      */
     public function store(Request $request)
     {
@@ -45,7 +45,7 @@ class PollController extends Controller
         Poll::create([
             'title' => $request->title,
             'description' => $request->description,
-            'options' => $request->options, // Casté automatiquement en JSON via le modèle
+            'options' => $request->options, // Casté automatiquement en JSON via le modèle Poll
             'is_active' => true,
         ]);
 
@@ -53,7 +53,7 @@ class PollController extends Controller
     }
 
     /**
-     * Permet à un utilisateur de voter
+     * Gère l'enregistrement du vote d'un utilisateur.
      */
     public function vote(Request $request, Poll $poll)
     {
@@ -61,15 +61,12 @@ class PollController extends Controller
             'choice' => 'required|string',
         ]);
 
-        // Vérifier si l'utilisateur a déjà voté
-        $alreadyVoted = Vote::where('poll_id', $poll->id)
-                            ->where('user_id', auth()->id())
-                            ->exists();
-
-        if ($alreadyVoted) {
+        // Vérification si l'utilisateur a déjà voté via la méthode du modèle
+        if ($poll->hasVoted(auth()->id())) {
             return back()->with('error', 'Vous avez déjà voté pour ce sondage.');
         }
 
+        // Création du vote dans la table 'votes'
         Vote::create([
             'poll_id' => $poll->id,
             'user_id' => auth()->id(),
@@ -80,35 +77,54 @@ class PollController extends Controller
     }
 
     /**
-     * Affiche les résultats (Le lien "Voir" dans ton tableau)
+     * Affiche les résultats détaillés d'un sondage.
      */
     public function results(Poll $poll)
     {
-        // Récupérer tous les votes pour ce sondage
+        // Récupérer tous les votes liés à ce sondage
         $votes = Vote::where('poll_id', $poll->id)->get();
         $totalVotes = $votes->count();
 
-        // Calculer les statistiques par option
+        // Calcul des statistiques par option
         $stats = [];
-        foreach ($poll->options as $option) {
-            $count = $votes->where('choice', $option)->count();
-            $percentage = $totalVotes > 0 ? ($count / $totalVotes) * 100 : 0;
-            
-            $stats[] = [
-                'option' => $option,
-                'count' => $count,
-                'percentage' => round($percentage, 1)
-            ];
+        if ($poll->options) {
+            foreach ($poll->options as $option) {
+                $count = $votes->where('choice', $option)->count();
+                $percentage = $totalVotes > 0 ? ($count / $totalVotes) * 100 : 0;
+                
+                $stats[] = [
+                    'option' => $option,
+                    'count' => $count,
+                    'percentage' => round($percentage, 1)
+                ];
+            }
         }
 
         return view('polls.results', compact('poll', 'stats', 'totalVotes'));
     }
 
+    /**
+     * Affiche un sondage spécifique ou redirige vers les résultats si déjà voté.
+     */
     public function show(Poll $poll)
     {
         if ($poll->hasVoted(auth()->id())) {
             return redirect()->route('polls.results', $poll);
         }
         return view('polls.show', compact('poll'));
+    }
+
+    /**
+     * Permet à l'admin de clôturer un sondage.
+     */
+    public function toggleStatus(Poll $poll)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $poll->update(['is_active' => !$poll->is_active]);
+
+        return back()->with('success', 'Le statut du sondage a été mis à jour.');
     }
 }

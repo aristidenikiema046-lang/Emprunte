@@ -5,27 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Task extends Model
+class Poll extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'title',
-        'description',
-        'priority',
-        'progress',
-        'is_completed',
-        'completed_at',
-    ];
+    protected $fillable = ['title', 'description', 'options', 'is_active'];
 
     protected $casts = [
-        'is_completed' => 'boolean',
-        'completed_at' => 'datetime',
+        'options' => 'array',
+        'is_active' => 'boolean',
     ];
 
-    public function user()
+    public function votes()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Vote::class);
+    }
+
+    public function hasVoted($userId)
+    {
+        return $this->votes()->where('user_id', $userId)->exists();
     }
 }

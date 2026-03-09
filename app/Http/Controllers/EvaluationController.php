@@ -50,21 +50,21 @@ class EvaluationController extends Controller
         
         $attendanceScore = ($daysPresent >= 3) ? 4.0 : ($daysPresent / 3) * 4;
 
-        // --- 2. PERFORMANCE TÂCHES (BASÉ SUR LA PROGRESSION RÉELLE) ---
+        // --- 2. PERFORMANCE TÂCHES ---
         $tasks = Task::where('user_id', $userId)->get();
         $tasksCount = $tasks->count();
         
         if ($tasksCount > 0) {
-            // On calcule la moyenne de progression (ex: une tâche à 50% = 0.5)
             $averageProgress = $tasks->avg('progress') / 100; 
             $taskRate = $averageProgress * 4; 
         } else {
-            $taskRate = 2.0; // Neutre si aucune tâche
+            $taskRate = 2.0; 
         }
 
-        // --- 3. ENGAGEMENT SONDAGES ---
+        // --- 3. ENGAGEMENT SONDAGES (CORRECTION DU NOM DE LA TABLE) ---
         $totalPolls = Poll::count();
-        $userVotes = DB::table('poll_votes')->where('user_id', $userId)->count(); 
+        // On utilise la table 'votes' qui est celle créée par ton modèle Vote
+        $userVotes = DB::table('votes')->where('user_id', $userId)->count(); 
         $engagementRate = $totalPolls > 0 ? ($userVotes / $totalPolls) * 4 : 2.0;
 
         // --- 4. MAPPING DES CRITÈRES ---
@@ -82,7 +82,7 @@ class EvaluationController extends Controller
             'communication'       => 3.0,
         ];
 
-        // --- 5. CALCUL FINAL PONDÉRÉ (Note sur 9) ---
+        // --- 5. CALCUL FINAL PONDÉRÉ / 9 ---
         $weights = [
             'problem_solving'     => 2 / 4,    
             'reporting'           => 2 / 4,    
@@ -98,13 +98,13 @@ class EvaluationController extends Controller
 
         $total = 0;
         foreach ($weights as $key => $factor) {
-            $total += $scores[$key] * $factor;
+            $total += ($scores[$key] ?? 0) * $factor;
         }
 
         Evaluation::create(array_merge($scores, [
             'total_score' => round($total, 2)
         ]));
 
-        return back()->with('success', "Audit généré. Score basé sur la progression : " . number_format($total, 2) . "/9");
+        return back()->with('success', "Audit généré avec succès. Score final : " . number_format($total, 2) . "/9");
     }
 }
