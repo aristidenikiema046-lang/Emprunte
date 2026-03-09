@@ -39,11 +39,14 @@
                         <i class="fa-solid fa-file-invoice-dollar mr-3 opacity-50"></i> Paie
                     </a>
 
-                    <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Administration</div>
-                    
-                    <a href="{{ route('users.index') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->routeIs('users.*') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
-                        <i class="fa-solid fa-users mr-3 opacity-50"></i> Utilisateurs
-                    </a>
+                    {{-- BLOC RÉSERVÉ À L'ADMIN --}}
+                    @if(auth()->user()->role === 'admin')
+                        <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Administration</div>
+                        
+                        <a href="{{ route('users.index') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->routeIs('users.*') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                            <i class="fa-solid fa-users mr-3 opacity-50"></i> Utilisateurs
+                        </a>
+                    @endif
 
                     <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Outils</div>
                     
@@ -51,7 +54,7 @@
                         <i class="fa-solid fa-envelope mr-3 opacity-50"></i> Messages
                     </a>
 
-                    <a href="{{ url('/documents') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->is('documents*') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                    <a href="{{ url('/documents/received') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->is('documents*') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
                         <i class="fa-solid fa-folder-open mr-3 opacity-50"></i> Documents
                     </a>
 
@@ -108,7 +111,6 @@
             </div>
         </div>
 
-        {{-- SEUL COMPOSANT UTILISÉ --}}
         @if(session('success') || session('error'))
             <x-notification />
         @endif
