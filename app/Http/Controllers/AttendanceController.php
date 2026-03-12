@@ -6,7 +6,8 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AttendanceReminder; // Importation de la notification
+use Illuminate\Support\Facades\DB;
+use App\Notifications\AttendanceReminder;
 
 class AttendanceController extends Controller
 {
@@ -20,12 +21,17 @@ class AttendanceController extends Controller
         $today = Carbon::today();
         $attendance = Attendance::where('user_id', $userId)->whereDate('date', $today)->first();
 
-        $completedDaysCount = Attendance::where('user_id', $userId)
-            ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-            ->where('is_completed', true)
+        // Calcul du quota hebdomadaire (Lundi au Vendredi)
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->startOfWeek()->addDays(4);
+
+        $daysPresentCount = Attendance::where('user_id', $userId)
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek->endOfDay()])
+            ->select(DB::raw('DATE(created_at) as date'))
+            ->distinct()
             ->count();
 
-        return view('attendances.index', compact('attendance', 'completedDaysCount'));
+        return view('attendances.index', compact('attendance', 'daysPresentCount'));
     }
 
     public function store(Request $request)
@@ -35,8 +41,13 @@ class AttendanceController extends Controller
             $step = $request->step;
             $now = Carbon::now();
             
+            // Sécurité Week-end
+            if ($now->isWeekend()) {
+                return response()->json(['success' => false, 'message' => "Le pointage est désactivé le week-end."], 403);
+            }
+
             $config = [
-                'check_in_8h30'   => '00:00',
+                'check_in_8h30'   => '00:00', 
                 'check_out_12h00' => '12:00',
                 'check_in_14h00'  => '14:00',
                 'check_out_17h00' => '17:00'
@@ -49,7 +60,7 @@ class AttendanceController extends Controller
 
             $distance = $this->calculateDistance($request->lat, $request->lng, $this->targetLat, $this->targetLon);
             if ($distance > $this->radius) {
-                return response()->json(['success' => false, 'message' => "Hors zone opérationnelle."], 403);
+                return response()->json(['success' => false, 'message' => "Hors zone opérationnelle (" . round($distance) . "m)."], 403);
             }
 
             $attendance = Attendance::firstOrCreate(['user_id' => $user->id, 'date' => Carbon::today()]);
@@ -58,20 +69,29 @@ class AttendanceController extends Controller
             $attendance->$step = $now;
             $msg = "Pointage réussi à " . $now->format('H:i');
 
-            if ($step === 'check_in_8h30') {
-                $limit = Carbon::today()->setTime(8, 30);
-                if ($now->gt($limit->addMinutes(5))) {
-                    $msg = "Retard enregistré : " . $now->diffInMinutes($limit) . " min.";
-                }
-            }
-
-            // --- AJOUT NOTIFICATION FIN DE JOURNÉE ---
+            // Notification de fin de journée
             if ($step == 'check_out_17h00') {
                 $attendance->is_completed = true;
                 $user->notify(new AttendanceReminder(
-                    "✅ Journée terminée ! Tous vos pointages ont été validés.", 
+                    "✅ Journée terminée ! Vos pointages sont validés.", 
                     route('attendances.index')
                 ));
+
+                // Vérification du quota de 3 jours après la fin de la journée
+                $startOfWeek = Carbon::now()->startOfWeek();
+                $endOfWeek = Carbon::now()->startOfWeek()->addDays(4);
+                $daysCount = Attendance::where('user_id', $user->id)
+                    ->whereBetween('created_at', [$startOfWeek, $endOfWeek->endOfDay()])
+                    ->select(DB::raw('DATE(created_at) as date'))
+                    ->distinct()
+                    ->count();
+
+                if ($daysCount == 3) {
+                    $user->notify(new AttendanceReminder(
+                        "🎉 Félicitations ! Quota hebdomadaire atteint (3/5 jours).", 
+                        route('attendances.index')
+                    ));
+                }
             }
 
             $attendance->save();
