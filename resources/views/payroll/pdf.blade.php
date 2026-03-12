@@ -35,7 +35,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="company-name">{{ config('app.name') }}</div>
+            <div class="company-name">Ya-consulting</div>
             <div class="title">BULLETIN DE PAIE</div>
         </div>
 
@@ -43,7 +43,7 @@
             <tr>
                 <td>
                     <div class="label">EMPLOYEUR</div>
-                    <div>{{ config('app.name') }}</div>
+                    <div><Ya-consulting></Ya-consulting></div>
                     <div>Siège Social, Abidjan</div>
                     <div>Contact: contact@ya-consulting.com</div>
                 </td>
