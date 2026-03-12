@@ -39,7 +39,6 @@
                         <i class="fa-solid fa-file-invoice-dollar mr-3 opacity-50"></i> Paie
                     </a>
 
-                    {{-- BLOC RÉSERVÉ À L'ADMIN --}}
                     @if(auth()->user()->role === 'admin')
                         <div class="px-6 mt-6 mb-2 text-[10px] uppercase font-black text-gray-500 tracking-widest">Administration</div>
                         
@@ -75,8 +74,47 @@
                         <span class="text-xs text-gray-500 font-bold uppercase tracking-tighter">SYSTÈME CONNECTÉ</span>
                     </div>
 
-                    <div class="flex items-center gap-6" x-data="{ open: false }">
-                        <div class="relative">
+                    <div class="flex items-center gap-6">
+                        {{-- CLOCHE DE NOTIFICATIONS --}}
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="relative text-gray-400 hover:text-white transition-colors">
+                                <i class="fa-solid fa-bell text-lg"></i>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                        {{ auth()->user()->unreadNotifications->count() }}
+                                    </span>
+                                @endif
+                            </button>
+
+                            <div x-show="open" @click.away="open = false" x-transition 
+                                 class="absolute right-0 mt-3 w-80 bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-50">
+                                <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                                    <h3 class="text-xs font-black text-white uppercase tracking-widest">Notifications</h3>
+                                    @if(auth()->user()->unreadNotifications->count() > 0)
+                                        <form action="{{ route('notifications.markAllRead') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-[10px] text-blue-500 hover:underline font-bold uppercase">Marquer lu</button>
+                                        </form>
+                                    @endif
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    @forelse(auth()->user()->unreadNotifications as $notification)
+                                        <a href="{{ $notification->data['link'] ?? '#' }}" class="block p-4 border-b border-gray-800 hover:bg-gray-800 transition-all">
+                                            <p class="text-xs text-gray-300 leading-relaxed">{{ $notification->data['message'] }}</p>
+                                            <p class="text-[10px] text-gray-500 mt-2 font-bold">{{ $notification->created_at->diffForHumans() }}</p>
+                                        </a>
+                                    @empty
+                                        <div class="p-8 text-center">
+                                            <i class="fa-solid fa-bell-slash text-gray-700 text-2xl mb-3"></i>
+                                            <p class="text-xs text-gray-500 font-bold uppercase">Aucune notification</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BLOC PROFIL --}}
+                        <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="focus:outline-none flex items-center gap-3">
                                 <div class="text-right hidden md:block border-r border-gray-800 pr-4">
                                     <p class="text-xs font-black text-white leading-none uppercase">{{ Auth::user()->name }}</p>
