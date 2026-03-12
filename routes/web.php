@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Admin\AttendanceOverviewController; // Import du nouveau contrôleur Admin
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PayrollController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\PollController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EvaluationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,8 +37,14 @@ Route::middleware('auth')->group(function () {
         return back();
     })->name('notifications.markAllRead');
 
-    // --- Présences ---
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    // --- Présences (Logique de redirection Admin vs User) ---
+    Route::get('/attendances', function () {
+        if (Auth::user()->can('admin-only')) {
+            return app(AttendanceOverviewController::class)->index();
+        }
+        return app(AttendanceController::class)->index();
+    })->name('attendances.index');
+
     Route::post('/attendances/store', [AttendanceController::class, 'store'])->name('attendances.store');
 
     // --- Tâches (Missions) ---
@@ -64,12 +72,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/admin/users', [UserController::class, 'store'])->name('users.store');
         Route::patch('/admin/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-        // Ajout du paramètre manquant pour toggleStatus
         Route::patch('/admin/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
+        
+        // On peut aussi garder une route explicite pour la supervision si besoin
+        Route::get('/admin/attendances', [AttendanceOverviewController::class, 'index'])->name('admin.attendances.index');
     });
 
     // --- Communication ---
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    // ... (le reste de tes routes messages reste identique)
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::patch('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
