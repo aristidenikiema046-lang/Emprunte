@@ -5,23 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Payroll;
 use App\Models\User;
-use App\Notifications\AttendanceReminder; // Importation de la notification
+use App\Notifications\AttendanceReminder;
+use Barryvdh\DomPDF\Facade\Pdf; // Import du moteur PDF
+use Illuminate\Support\Facades\Storage;
 
 class PayrollController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
-
-        // On vérifie le rôle pour filtrer les données
         if ($user->role === 'admin') {
             $payrolls = Payroll::with('user')->latest()->get();
-            $users = User::all(); // Pour le select du formulaire
+            $users = User::all();
         } else {
             $payrolls = Payroll::where('user_id', $user->id)->latest()->get();
-            $users = collect(); // On envoie une collection vide (sécurité)
+            $users = collect();
         }
-
         return view('payroll.index', compact('payrolls', 'users'));
     }
 
@@ -32,31 +31,50 @@ class PayrollController extends Controller
             'month' => 'required',
             'amount' => 'required|numeric',
             'status' => 'required',
-            'pdf' => 'nullable|mimes:pdf|max:2048'
         ]);
 
-        $path = $request->file('pdf') ? $request->file('pdf')->store('bulletins', 'public') : null;
+        $user = User::find($request->user_id);
 
+        // --- GÉNÉRATION AUTOMATIQUE DU PDF ---
+        $data = [
+            'user' => $user,
+            'month' => $request->month,
+            'amount' => $request->amount,
+            'date' => now()->format('d/m/Y')
+        ];
+
+        $pdf = Pdf::loadView('payroll.pdf', $data);
+        
+        // Nom du fichier unique
+        $fileName = 'bulletin_' . $user->id . '_' . str_replace('/', '-', $request->month) . '.pdf';
+        $path = 'bulletins/' . $fileName;
+
+        // Sauvegarde sur le serveur (storage/app/public/bulletins)
+        Storage::disk('public')->put($path, $pdf->output());
+
+        // --- CRÉATION EN BDD ---
         $payroll = Payroll::create([
             'user_id' => $request->user_id,
             'month' => $request->month,
             'amount' => $request->amount,
             'status' => $request->status,
-            'pdf_path' => $path
+            'pdf_path' => $path // On enregistre le chemin du PDF généré
         ]);
 
-        // --- AJOUT NOTIFICATION POUR L'EMPLOYÉ ---
-        $employee = User::find($request->user_id);
-        $employee->notify(new AttendanceReminder(
-            "💵 Votre fiche de paie pour le mois de " . $request->month . " est disponible.", 
+        // Notification
+        $user->notify(new AttendanceReminder(
+            "💵 Votre fiche de paie de " . $request->month . " a été générée automatiquement.", 
             route('payroll.index')
         ));
 
-        return back()->with('success', 'Bulletin enregistré avec succès.');
+        return back()->with('success', 'Bulletin généré et envoyé avec succès.');
     }
 
     public function destroy(Payroll $payroll)
     {
+        if ($payroll->pdf_path) {
+            Storage::disk('public')->delete($payroll->pdf_path);
+        }
         $payroll->delete();
         return back()->with('success', 'Bulletin supprimé.');
     }
