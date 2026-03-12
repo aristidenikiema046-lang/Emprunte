@@ -11,7 +11,7 @@
                     <i class="fa-solid fa-fingerprint text-3xl text-blue-400"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-black tracking-tight text-white italic uppercase">SMART <span class="text-blue-500">CHECK</span></h2>
+                    <h2 class="text-2xl font-black tracking-tight text-white italic uppercase">Pointage <span class="text-blue-500">CHECK</span></h2>
                     <p class="text-[9px] font-bold text-slate-500 tracking-[0.3em] uppercase">Validation Biométrique & Horaire</p>
                 </div>
             </div>
