@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Models\Poll;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class EvaluationController extends Controller
 {
@@ -61,9 +62,8 @@ class EvaluationController extends Controller
             $taskRate = 2.0; 
         }
 
-        // --- 3. ENGAGEMENT SONDAGES (CORRECTION DU NOM DE LA TABLE) ---
+        // --- 3. ENGAGEMENT SONDAGES ---
         $totalPolls = Poll::count();
-        // On utilise la table 'votes' qui est celle créée par ton modèle Vote
         $userVotes = DB::table('votes')->where('user_id', $userId)->count(); 
         $engagementRate = $totalPolls > 0 ? ($userVotes / $totalPolls) * 4 : 2.0;
 
@@ -82,7 +82,7 @@ class EvaluationController extends Controller
             'communication'       => 3.0,
         ];
 
-        // --- 5. CALCUL FINAL PONDÉRÉ / 9 ---
+        // --- 5. CALCUL FINAL PONDÉRÉ ---
         $weights = [
             'problem_solving'     => 2 / 4,    
             'reporting'           => 2 / 4,    
@@ -101,9 +101,17 @@ class EvaluationController extends Controller
             $total += ($scores[$key] ?? 0) * $factor;
         }
 
-        Evaluation::create(array_merge($scores, [
+        $evaluation = Evaluation::create(array_merge($scores, [
             'total_score' => round($total, 2)
         ]));
+
+        // --- AJOUT NOTIFICATION POUR L'EMPLOYÉ ---
+        $employee = User::find($userId);
+        $scoreFinal = round($total, 2);
+        $employee->notify(new AttendanceReminder(
+            "⭐ Votre nouvel audit de performance est disponible. Score : $scoreFinal / 9", 
+            route('evaluations.index')
+        ));
 
         return back()->with('success', "Audit généré avec succès. Score final : " . number_format($total, 2) . "/9");
     }

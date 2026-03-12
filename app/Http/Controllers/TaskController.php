@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class TaskController extends Controller
 {
@@ -28,12 +29,19 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
         ]);
 
-        Task::create([
+        $task = Task::create([
             'user_id' => $request->user_id,
             'title' => $request->title,
             'progress' => 0,
             'is_completed' => false,
         ]);
+
+        // --- AJOUT NOTIFICATION ASSIGNATION ---
+        $assignedUser = User::find($request->user_id);
+        $assignedUser->notify(new AttendanceReminder(
+            "📌 Nouvelle mission assignée : " . $task->title, 
+            route('tasks.index')
+        ));
 
         return back()->with('success', "Mission assignée avec succès !");
     }
@@ -48,11 +56,24 @@ class TaskController extends Controller
             'progress' => 'required|integer|min:0|max:100',
         ]);
 
+        $isNowCompleted = ($request->progress == 100 && !$task->is_completed);
+
         $task->update([
             'progress' => $request->progress,
             'is_completed' => ($request->progress == 100),
             'completed_at' => ($request->progress == 100) ? now() : null,
         ]);
+
+        // --- AJOUT NOTIFICATION À L'ADMIN SI TERMINÉ ---
+        if ($isNowCompleted) {
+            $admin = User::where('role', 'admin')->first();
+            if ($admin) {
+                $admin->notify(new AttendanceReminder(
+                    "✅ Mission terminée par " . auth()->user()->name . " : " . $task->title, 
+                    route('tasks.index')
+                ));
+            }
+        }
 
         return back()->with('success', "Progression mise à jour : {$request->progress}%");
     }
@@ -69,6 +90,17 @@ class TaskController extends Controller
             'progress' => $newStatus ? 100 : 0,
             'completed_at' => $newStatus ? now() : null
         ]);
+
+        // Notification si clôturée manuellement par l'utilisateur
+        if ($newStatus && auth()->user()->role !== 'admin') {
+            $admin = User::where('role', 'admin')->first();
+            if ($admin) {
+                $admin->notify(new AttendanceReminder(
+                    "✅ Mission clôturée par " . auth()->user()->name . " : " . $task->title, 
+                    route('tasks.index')
+                ));
+            }
+        }
 
         return back()->with('success', $newStatus ? "Mission clôturée." : "Mission réactivée.");
     }

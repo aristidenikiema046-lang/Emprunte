@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class MessageController extends Controller
 {
@@ -41,7 +42,7 @@ class MessageController extends Controller
             $name = $request->file('file')->getClientOriginalName();
         }
 
-        Message::create([
+        $message = Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $request->receiver_id,
             'content' => $request->content ?? '',
@@ -49,12 +50,20 @@ class MessageController extends Controller
             'file_name' => $name,
         ]);
 
+        // --- AJOUT NOTIFICATION POUR LE DESTINATAIRE ---
+        $receiver = User::find($request->receiver_id);
+        $preview = $request->content ? substr($request->content, 0, 50) . '...' : '📎 Fichier joint';
+        
+        $receiver->notify(new AttendanceReminder(
+            "📩 Nouveau message de " . auth()->user()->name . " : " . $preview, 
+            route('messages.index', ['user' => auth()->id()])
+        ));
+
         return back();
     }
 
     public function update(Request $request, Message $message)
     {
-        // Sécurité : Seul l'expéditeur peut modifier
         if ($message->sender_id !== auth()->id()) {
             return back()->with('error', 'Action non autorisée');
         }
@@ -67,7 +76,6 @@ class MessageController extends Controller
 
     public function destroy(Message $message)
     {
-        // Sécurité : Seul l'expéditeur peut supprimer
         if ($message->sender_id !== auth()->id()) {
             return back()->with('error', 'Action non autorisée');
         }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Poll;
 use App\Models\Vote;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class PollController extends Controller
 {
@@ -23,7 +25,6 @@ class PollController extends Controller
      */
     public function create()
     {
-        // Vérification de sécurité pour l'admin
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Action non autorisée.');
         }
@@ -31,7 +32,7 @@ class PollController extends Controller
     }
 
     /**
-     * Enregistre un nouveau sondage dans la base de données.
+     * Enregistre un nouveau sondage et notifie TOUS les employés.
      */
     public function store(Request $request)
     {
@@ -42,12 +43,22 @@ class PollController extends Controller
             'options.*' => 'required|string',
         ]);
 
-        Poll::create([
+        $poll = Poll::create([
             'title' => $request->title,
             'description' => $request->description,
-            'options' => $request->options, // Casté automatiquement en JSON via le modèle Poll
+            'options' => $request->options, 
             'is_active' => true,
         ]);
+
+        // --- AJOUT NOTIFICATION COLLECTIVE ---
+        // On récupère tous les utilisateurs (sauf l'admin qui crée le sondage)
+        $users = User::where('id', '!=', auth()->id())->get();
+        foreach ($users as $user) {
+            $user->notify(new AttendanceReminder(
+                "📊 Nouveau sondage : " . $poll->title . ". Votre avis nous intéresse !", 
+                route('polls.show', $poll->id)
+            ));
+        }
 
         return redirect()->route('polls.index')->with('success', 'Sondage publié avec succès !');
     }
@@ -61,12 +72,10 @@ class PollController extends Controller
             'choice' => 'required|string',
         ]);
 
-        // Vérification si l'utilisateur a déjà voté via la méthode du modèle
         if ($poll->hasVoted(auth()->id())) {
             return back()->with('error', 'Vous avez déjà voté pour ce sondage.');
         }
 
-        // Création du vote dans la table 'votes'
         Vote::create([
             'poll_id' => $poll->id,
             'user_id' => auth()->id(),
@@ -81,11 +90,9 @@ class PollController extends Controller
      */
     public function results(Poll $poll)
     {
-        // Récupérer tous les votes liés à ce sondage
         $votes = Vote::where('poll_id', $poll->id)->get();
         $totalVotes = $votes->count();
 
-        // Calcul des statistiques par option
         $stats = [];
         if ($poll->options) {
             foreach ($poll->options as $option) {
@@ -104,7 +111,7 @@ class PollController extends Controller
     }
 
     /**
-     * Affiche un sondage spécifique ou redirige vers les résultats si déjà voté.
+     * Affiche un sondage spécifique.
      */
     public function show(Poll $poll)
     {

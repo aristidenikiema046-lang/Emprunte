@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Payroll;
 use App\Models\User;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class PayrollController extends Controller
 {
@@ -36,13 +37,20 @@ class PayrollController extends Controller
 
         $path = $request->file('pdf') ? $request->file('pdf')->store('bulletins', 'public') : null;
 
-        Payroll::create([
+        $payroll = Payroll::create([
             'user_id' => $request->user_id,
             'month' => $request->month,
             'amount' => $request->amount,
             'status' => $request->status,
             'pdf_path' => $path
         ]);
+
+        // --- AJOUT NOTIFICATION POUR L'EMPLOYÉ ---
+        $employee = User::find($request->user_id);
+        $employee->notify(new AttendanceReminder(
+            "💵 Votre fiche de paie pour le mois de " . $request->month . " est disponible.", 
+            route('payroll.index')
+        ));
 
         return back()->with('success', 'Bulletin enregistré avec succès.');
     }

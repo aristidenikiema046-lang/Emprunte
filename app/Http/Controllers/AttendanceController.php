@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AttendanceReminder; // Importation de la notification
 
 class AttendanceController extends Controller
 {
@@ -34,21 +35,18 @@ class AttendanceController extends Controller
             $step = $request->step;
             $now = Carbon::now();
             
-            // Définition des heures minimales pour chaque bouton
             $config = [
-                'check_in_8h30'   => '00:00', // Ouvert dès le matin
+                'check_in_8h30'   => '00:00',
                 'check_out_12h00' => '12:00',
                 'check_in_14h00'  => '14:00',
                 'check_out_17h00' => '17:00'
             ];
 
-            // 1. Sécurité Horaire : On ne peut pas pointer avant l'heure prévue
             $minTime = Carbon::today()->setTimeFromTimeString($config[$step]);
             if ($now->lt($minTime)) {
                 return response()->json(['success' => false, 'message' => "Trop tôt ! Attendez " . $config[$step]], 403);
             }
 
-            // 2. Sécurité Géographique
             $distance = $this->calculateDistance($request->lat, $request->lng, $this->targetLat, $this->targetLon);
             if ($distance > $this->radius) {
                 return response()->json(['success' => false, 'message' => "Hors zone opérationnelle."], 403);
@@ -67,7 +65,14 @@ class AttendanceController extends Controller
                 }
             }
 
-            if ($step == 'check_out_17h00') $attendance->is_completed = true;
+            // --- AJOUT NOTIFICATION FIN DE JOURNÉE ---
+            if ($step == 'check_out_17h00') {
+                $attendance->is_completed = true;
+                $user->notify(new AttendanceReminder(
+                    "✅ Journée terminée ! Tous vos pointages ont été validés.", 
+                    route('attendances.index')
+                ));
+            }
 
             $attendance->save();
             return response()->json(['success' => true, 'message' => $msg]);
