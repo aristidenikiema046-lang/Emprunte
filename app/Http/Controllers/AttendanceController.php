@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,6 @@ class AttendanceController extends Controller
         $today = Carbon::today();
         $attendance = Attendance::where('user_id', $userId)->whereDate('date', $today)->first();
 
-        // Calcul du quota hebdomadaire (Lundi au Vendredi)
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->startOfWeek()->addDays(4);
 
@@ -41,17 +41,20 @@ class AttendanceController extends Controller
             $step = $request->step;
             $now = Carbon::now();
             
-            // Sécurité Week-end
             if ($now->isWeekend()) {
                 return response()->json(['success' => false, 'message' => "Le pointage est désactivé le week-end."], 403);
             }
 
+            // Pour store, on ne traite manuellement que l'arrivée et la descente
+            // car 12h et 14h sont désormais automatiques.
             $config = [
                 'check_in_8h30'   => '00:00', 
-                'check_out_12h00' => '12:00',
-                'check_in_14h00'  => '14:00',
                 'check_out_17h00' => '17:00'
             ];
+
+            if(!isset($config[$step])) {
+                return response()->json(['success' => false, 'message' => "Cette étape est automatisée."], 403);
+            }
 
             $minTime = Carbon::today()->setTimeFromTimeString($config[$step]);
             if ($now->lt($minTime)) {
@@ -69,28 +72,18 @@ class AttendanceController extends Controller
             $attendance->$step = $now;
             $msg = "Pointage réussi à " . $now->format('H:i');
 
-            // Notification de fin de journée
             if ($step == 'check_out_17h00') {
                 $attendance->is_completed = true;
-                $user->notify(new AttendanceReminder(
-                    "✅ Journée terminée ! Vos pointages sont validés.", 
-                    route('attendances.index')
-                ));
+                $user->notify(new AttendanceReminder("✅ Journée terminée ! Vos pointages sont validés.", route('attendances.index')));
 
-                // Vérification du quota de 3 jours après la fin de la journée
                 $startOfWeek = Carbon::now()->startOfWeek();
                 $endOfWeek = Carbon::now()->startOfWeek()->addDays(4);
                 $daysCount = Attendance::where('user_id', $user->id)
                     ->whereBetween('created_at', [$startOfWeek, $endOfWeek->endOfDay()])
-                    ->select(DB::raw('DATE(created_at) as date'))
-                    ->distinct()
-                    ->count();
+                    ->select(DB::raw('DATE(created_at) as date'))->distinct()->count();
 
                 if ($daysCount == 3) {
-                    $user->notify(new AttendanceReminder(
-                        "🎉 Félicitations ! Quota hebdomadaire atteint (3/5 jours).", 
-                        route('attendances.index')
-                    ));
+                    $user->notify(new AttendanceReminder("🎉 Félicitations ! Quota hebdomadaire atteint (3/5 jours).", route('attendances.index')));
                 }
             }
 
@@ -99,6 +92,35 @@ class AttendanceController extends Controller
 
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MÉTHODE D'AUTOMATISATION (Appelée par le Scheduler)
+     */
+    public static function automatePause($type)
+    {
+        $today = Carbon::today();
+        if ($today->isWeekend()) return;
+
+        // On récupère tous les employés ayant pointé à 8h30 aujourd'hui
+        $attendances = Attendance::whereDate('date', $today)
+            ->whereNotNull('check_in_8h30')
+            ->get();
+
+        foreach ($attendances as $attendance) {
+            $user = $attendance->user;
+            
+            if ($type == 'pause' && !$attendance->check_out_12h00) {
+                $attendance->check_out_12h00 = $today->copy()->setTime(12, 0);
+                $attendance->save();
+                $user->notify(new AttendanceReminder("🍽️ C'est l'heure de la pause ! Pointage automatique effectué à 12:00.", route('attendances.index')));
+            } 
+            elseif ($type == 'reprise' && !$attendance->check_in_14h00) {
+                $attendance->check_in_14h00 = $today->copy()->setTime(14, 0);
+                $attendance->save();
+                $user->notify(new AttendanceReminder("💻 Fin de la pause. Reprise automatique effectuée à 14:00.", route('attendances.index')));
+            }
         }
     }
 
