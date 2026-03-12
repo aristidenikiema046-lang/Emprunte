@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Payroll;
 use App\Models\User;
 use App\Notifications\AttendanceReminder;
-use Barryvdh\DomPDF\Facade\Pdf; // Import du moteur PDF
+use Barryvdh\DomPDF\Facade\Pdf as PDF; // L'alias important ici
 use Illuminate\Support\Facades\Storage;
 
 class PayrollController extends Controller
@@ -28,46 +28,48 @@ class PayrollController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'month' => 'required',
+            'month' => 'required|string',
             'amount' => 'required|numeric',
             'status' => 'required',
         ]);
 
         $user = User::find($request->user_id);
 
-        // --- GÉNÉRATION AUTOMATIQUE DU PDF ---
+        // 1. Préparation des données pour le PDF
         $data = [
             'user' => $user,
             'month' => $request->month,
             'amount' => $request->amount,
-            'date' => now()->format('d/m/Y')
+            'date' => now()->format('d/m/Y'),
         ];
 
-        $pdf = Pdf::loadView('payroll.pdf', $data);
+        // 2. Génération du PDF avec la vue payroll.pdf
+        // Assure-toi d'avoir créé resources/views/payroll/pdf.blade.php
+        $pdf = PDF::loadView('payroll.pdf', $data);
         
-        // Nom du fichier unique
-        $fileName = 'bulletin_' . $user->id . '_' . str_replace('/', '-', $request->month) . '.pdf';
+        // 3. Définition du chemin de stockage
+        $fileName = 'bulletin_' . $user->id . '_' . time() . '.pdf';
         $path = 'bulletins/' . $fileName;
 
-        // Sauvegarde sur le serveur (storage/app/public/bulletins)
+        // 4. Sauvegarde physique du fichier
         Storage::disk('public')->put($path, $pdf->output());
 
-        // --- CRÉATION EN BDD ---
-        $payroll = Payroll::create([
+        // 5. Enregistrement en Base de Données
+        Payroll::create([
             'user_id' => $request->user_id,
             'month' => $request->month,
             'amount' => $request->amount,
             'status' => $request->status,
-            'pdf_path' => $path // On enregistre le chemin du PDF généré
+            'pdf_path' => $path,
         ]);
 
-        // Notification
+        // 6. Notification à l'employé
         $user->notify(new AttendanceReminder(
-            "💵 Votre fiche de paie de " . $request->month . " a été générée automatiquement.", 
+            "💵 Un nouveau bulletin de paie est disponible pour le mois de : " . $request->month, 
             route('payroll.index')
         ));
 
-        return back()->with('success', 'Bulletin généré et envoyé avec succès.');
+        return back()->with('success', 'Le bulletin a été généré avec succès !');
     }
 
     public function destroy(Payroll $payroll)
