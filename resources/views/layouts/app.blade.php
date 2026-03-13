@@ -20,7 +20,7 @@
                 
                 <div class="flex-1 overflow-y-auto py-4">
                     <a href="{{ route('dashboard') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->routeIs('dashboard') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
-                        <i class="fa-solid fa-chart-pie mr-3 opacity-50"></i> Dashboard
+                        <i class="fa-solid fa-chart-pie mr-3 opacity-50"></i> Tableau de bord
                     </a>
 
                     <a href="{{ route('attendances.index') }}" class="flex items-center px-6 py-3 text-xs font-bold {{ request()->routeIs('attendances.*') ? 'text-white bg-blue-600/20 border-r-4 border-blue-500' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">

@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
-use App\Notifications\AttendanceReminder; // Importation de la notification
+use App\Notifications\AttendanceReminder;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -13,10 +14,17 @@ class TaskController extends Controller
     {
         $users = User::where('role', '!=', 'admin')->get();
 
+        // Système de tri : 
+        // 1. Les tâches non complétées d'abord (is_completed asc)
+        // 2. Les plus urgentes d'abord (due_date asc)
+        $query = Task::with('user')
+            ->orderBy('is_completed', 'asc') 
+            ->orderBy('due_date', 'asc');
+
         if (auth()->user()->role === 'admin') {
-            $tasks = Task::with('user')->latest()->get();
+            $tasks = $query->get();
         } else {
-            $tasks = auth()->user()->tasks()->latest()->get();
+            $tasks = $query->where('user_id', auth()->id())->get();
         }
 
         return view('tasks.index', compact('tasks', 'users'));
@@ -27,34 +35,35 @@ class TaskController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
+            'due_date' => 'required|date|after_or_equal:today',
         ]);
 
         $task = Task::create([
             'user_id' => $request->user_id,
             'title' => $request->title,
+            'due_date' => $request->due_date,
             'progress' => 0,
             'is_completed' => false,
         ]);
 
-        // --- AJOUT NOTIFICATION ASSIGNATION ---
         $assignedUser = User::find($request->user_id);
+        $deadline = Carbon::parse($task->due_date)->format('d/m H:i');
+        
         $assignedUser->notify(new AttendanceReminder(
-            "📌 Nouvelle mission assignée : " . $task->title, 
+            "📌 Nouvelle mission : {$task->title} (Échéance : {$deadline})", 
             route('tasks.index')
         ));
 
-        return back()->with('success', "Mission assignée avec succès !");
+        return back()->with('success', "Mission assignée (Échéance : {$deadline})");
     }
 
     public function updateProgress(Request $request, Task $task)
     {
         if ($task->user_id != auth()->id()) {
-            abort(403, "Seul le collaborateur assigné peut modifier sa progression.");
+            abort(403);
         }
 
-        $request->validate([
-            'progress' => 'required|integer|min:0|max:100',
-        ]);
+        $request->validate(['progress' => 'required|integer|min:0|max:100']);
 
         $isNowCompleted = ($request->progress == 100 && !$task->is_completed);
 
@@ -64,7 +73,6 @@ class TaskController extends Controller
             'completed_at' => ($request->progress == 100) ? now() : null,
         ]);
 
-        // --- AJOUT NOTIFICATION À L'ADMIN SI TERMINÉ ---
         if ($isNowCompleted) {
             $admin = User::where('role', 'admin')->first();
             if ($admin) {
@@ -75,7 +83,7 @@ class TaskController extends Controller
             }
         }
 
-        return back()->with('success', "Progression mise à jour : {$request->progress}%");
+        return back()->with('success', "Progression : {$request->progress}%");
     }
 
     public function toggle(Task $task)
@@ -91,26 +99,12 @@ class TaskController extends Controller
             'completed_at' => $newStatus ? now() : null
         ]);
 
-        // Notification si clôturée manuellement par l'utilisateur
-        if ($newStatus && auth()->user()->role !== 'admin') {
-            $admin = User::where('role', 'admin')->first();
-            if ($admin) {
-                $admin->notify(new AttendanceReminder(
-                    "✅ Mission clôturée par " . auth()->user()->name . " : " . $task->title, 
-                    route('tasks.index')
-                ));
-            }
-        }
-
         return back()->with('success', $newStatus ? "Mission clôturée." : "Mission réactivée.");
     }
 
     public function destroy(Task $task)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
-
+        if (auth()->user()->role !== 'admin') abort(403);
         $task->delete();
         return back()->with('error', 'Mission supprimée.');
     }
