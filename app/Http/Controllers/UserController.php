@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -20,12 +21,19 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Obligatoire ici
         ]);
+
+        $path = null;
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+        }
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'avatar' => $path,
             'role' => 'user',
             'is_active' => true, 
         ]);
@@ -36,43 +44,38 @@ class UserController extends Controller
     public function toggleStatus(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Alerte : Vous ne pouvez pas suspendre votre propre compte administrateur.');
+            return redirect()->back()->with('error', 'Alerte : Vous ne pouvez pas suspendre votre propre compte.');
         }
 
         $user->is_active = !$user->is_active;
         $user->save();
 
-        if ($user->is_active) {
-            return redirect()->back()->with('success', "Accès autorisé : {$user->name} peut maintenant se connecter.");
-        } else {
-            return redirect()->back()->with('error', "Accès révoqué : Le compte de {$user->name} est désormais suspendu.");
-        }
+        return redirect()->back()->with('success', "Le statut de {$user->name} a été modifié.");
     }
 
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Action interdite : Suppression de votre propre compte impossible.');
+            return redirect()->back()->with('error', 'Action interdite.');
         }
 
-        $userName = $user->name;
-        $user->delete();
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
 
-        return redirect()->back()->with('success', "Le profil de $userName a été définitivement retiré du système.");
+        $user->delete();
+        return redirect()->back()->with('success', "Profil retiré du système.");
     }
 
     public function updateRole(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Modification impossible : Vous ne pouvez pas changer votre propre rôle.');
+            return redirect()->back()->with('error', 'Impossible de changer votre propre rôle.');
         }
 
         $user->role = ($user->role === 'admin') ? 'user' : 'admin';
         $user->save();
 
-        $statusType = $user->role === 'admin' ? 'success' : 'error';
-        $msg = "Mise à jour : {$user->name} est désormais enregistré comme {$user->role}.";
-
-        return redirect()->back()->with($statusType, $msg);
+        return redirect()->back()->with('success', "Rôle mis à jour.");
     }
 }

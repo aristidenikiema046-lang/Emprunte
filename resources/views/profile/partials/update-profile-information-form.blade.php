@@ -5,6 +5,7 @@
         </h2>
         <p class="mt-1 text-sm text-gray-400 italic">
             {{ __("Mettez à jour vos informations personnelles et votre photo de profil.") }}
+            <span class="text-red-500 font-bold block mt-1">La photo de profil est désormais obligatoire.</span>
         </p>
     </header>
 
@@ -17,19 +18,34 @@
         @method('patch')
 
         {{-- Section Avatar Dark --}}
-        <div class="flex items-center gap-6 p-6 rounded-[2rem] border border-white/5 shadow-inner" style="background-color: #0b0f1a;">
+        <div class="flex items-center gap-6 p-6 rounded-[2rem] border {{ !$user->avatar ? 'border-red-500/50' : 'border-white/5' }} shadow-inner" style="background-color: #0b0f1a;">
             <div class="relative">
                 <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name) }}" 
-                     class="w-24 h-24 rounded-3xl object-cover border-2 border-blue-500 shadow-lg">
+                     class="w-24 h-24 rounded-3xl object-cover border-2 {{ !$user->avatar ? 'border-red-500' : 'border-blue-500' }} shadow-lg">
+                
+                @if(!$user->avatar)
+                    <span class="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase animate-bounce">Manquant</span>
+                @endif
             </div>
+            
             <div class="flex-1">
-                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Photo de profil</label>
-                <input type="file" name="avatar" class="block w-full text-xs text-gray-400
+                <label class="block text-[10px] font-black {{ !$user->avatar ? 'text-red-500' : 'text-gray-500' }} uppercase tracking-widest mb-3">
+                    Photo de profil {{ !$user->avatar ? '(Obligatoire)' : '' }}
+                </label>
+                
+                {{-- L'input devient REQUIRED si l'avatar est nul --}}
+                <input type="file" name="avatar" 
+                    {{ !$user->avatar ? 'required' : '' }}
+                    class="block w-full text-xs text-gray-400
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-[10px] file:font-black file:uppercase
                     file:bg-blue-600 file:text-white
                     hover:file:bg-blue-700 transition-all cursor-pointer">
+                
+                @if($errors->has('avatar'))
+                    <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $errors->first('avatar') }}</p>
+                @endif
             </div>
         </div>
 
