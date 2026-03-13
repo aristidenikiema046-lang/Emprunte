@@ -3,9 +3,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
+                {{-- Formulaire --}}
                 <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
                     <h3 class="text-lg font-bold mb-4 text-indigo-400">Demander un congé</h3>
-                    <form action="{{ route('leaves.store') }}" method="POST" class="space-y-4">
+                    <form action="{{ route('leaves.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         <div>
                             <label class="block text-sm font-medium text-slate-400">Type de congé</label>
@@ -29,10 +30,15 @@
                             <label class="block text-sm font-medium text-slate-400">Motif</label>
                             <textarea name="reason" rows="3" class="mt-1 block w-full rounded-xl bg-slate-900 border-slate-700 text-white" placeholder="Pourquoi demandez-vous ce congé ?" required></textarea>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400">Justificatif (Optionnel - PDF, Image)</label>
+                            <input type="file" name="attachment" class="mt-1 block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                        </div>
                         <button type="submit" class="w-full bg-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-500 transition">Envoyer la demande</button>
                     </form>
                 </div>
 
+                {{-- Liste --}}
                 <div class="md:col-span-2 bg-slate-800 p-6 rounded-3xl border border-slate-700">
                     <h3 class="text-lg font-bold mb-4">Mes demandes récentes</h3>
                     <table class="w-full text-left">
@@ -40,6 +46,7 @@
                             <tr>
                                 <th class="pb-3">Type</th>
                                 <th class="pb-3">Période</th>
+                                <th class="pb-3 text-center">Doc</th>
                                 <th class="pb-3">Statut</th>
                             </tr>
                         </thead>
@@ -48,8 +55,17 @@
                             <tr>
                                 <td class="py-4 text-sm">{{ $leave->type }}</td>
                                 <td class="py-4 text-sm text-slate-400">Du {{ $leave->start_date }} au {{ $leave->end_date }}</td>
+                                <td class="py-4 text-center">
+                                    @if($leave->attachment)
+                                        <a href="{{ asset('storage/' . $leave->attachment) }}" target="_blank" class="text-indigo-400 hover:text-indigo-300">
+                                            <i class="fa-solid fa-paperclip"></i>
+                                        </a>
+                                    @else
+                                        <span class="text-slate-600">-</span>
+                                    @endif
+                                </td>
                                 <td class="py-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold 
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold 
                                         {{ $leave->status == 'approuvé' ? 'bg-green-500/20 text-green-400' : 
                                            ($leave->status == 'refusé' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400') }}">
                                         {{ ucfirst($leave->status) }}
@@ -57,9 +73,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr>
-                                <td colspan="3" class="py-4 text-center text-slate-500 italic">Aucune demande pour le moment.</td>
-                            </tr>
+                            <tr><td colspan="4" class="py-4 text-center text-slate-500">Aucune demande.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Leave;
-use App\Models\User; // Ajouté pour la recherche d'admin si besoin
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Notifications\AttendanceReminder; // Importation de la notification
+use App\Notifications\AttendanceReminder;
+use Illuminate\Support\Facades\Storage;
 
 class LeaveController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->isAdmin()) {
+        if (auth()->user()->role === 'admin') {
             $leaves = Leave::with('user')->latest()->get();
             return view('admin.leaves.index', compact('leaves'));
         }
@@ -27,7 +28,13 @@ class LeaveController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2Mo
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('attachments', 'public');
+        }
 
         $leave = Leave::create([
             'user_id' => auth()->id(),
@@ -35,10 +42,10 @@ class LeaveController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'reason' => $request->reason,
+            'attachment' => $attachmentPath,
             'status' => 'en_attente',
         ]);
 
-        // Optionnel : Notifier l'admin qu'une nouvelle demande est arrivée
         $admin = User::where('role', 'admin')->first();
         if ($admin) {
             $admin->notify(new AttendanceReminder(
@@ -47,7 +54,7 @@ class LeaveController extends Controller
             ));
         }
 
-        return back()->with('success', 'Votre demande de congé a été transmise à l\'administration.');
+        return back()->with('success', 'Votre demande de congé avec justificatif a été transmise.');
     }
 
     public function updateStatus(Request $request, Leave $leave)
@@ -55,17 +62,12 @@ class LeaveController extends Controller
         $request->validate(['status' => 'required|in:approuvé,refusé']);
         $leave->update(['status' => $request->status]);
 
-        // --- AJOUT NOTIFICATION POUR L'EMPLOYÉ ---
         $icon = $request->status === 'approuvé' ? '✅' : '❌';
         $leave->user->notify(new AttendanceReminder(
             "$icon Votre demande de congé ({$leave->type}) a été {$request->status}.", 
             route('leaves.index')
         ));
 
-        if ($request->status === 'approuvé') {
-            return back()->with('success', "La demande de congé de {$leave->user->name} a été validée.");
-        } else {
-            return back()->with('error', "La demande de congé de {$leave->user->name} a été refusée.");
-        }
+        return back()->with('success', "Le statut a été mis à jour avec succès.");
     }
 }
