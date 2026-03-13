@@ -45,33 +45,44 @@ class AttendanceController extends Controller
                 return response()->json(['success' => false, 'message' => "Le pointage est désactivé le week-end."], 403);
             }
 
-            // Pour store, on ne traite manuellement que l'arrivée et la descente
-            // car 12h et 14h sont désormais automatiques.
+            // CONFIGURATION : On définit l'heure d'ouverture pour chaque bouton
             $config = [
-                'check_in_8h30'   => '00:00', 
-                'check_out_17h00' => '17:00'
+                'check_in_8h30'   => '00:00', // Ouvert dès le matin
+                'check_out_12h00' => '12:00', // Ouvert à partir de midi
+                'check_in_14h00'  => '14:00', // Ouvert à partir de 14h
+                'check_out_17h00' => '17:00'  // Ouvert à partir de 17h
             ];
 
+            // Vérifier si l'étape existe
             if(!isset($config[$step])) {
-                return response()->json(['success' => false, 'message' => "Cette étape est automatisée."], 403);
+                return response()->json(['success' => false, 'message' => "Étape de pointage invalide."], 403);
             }
 
+            // Vérifier si l'heure est venue
             $minTime = Carbon::today()->setTimeFromTimeString($config[$step]);
             if ($now->lt($minTime)) {
                 return response()->json(['success' => false, 'message' => "Trop tôt ! Attendez " . $config[$step]], 403);
             }
 
+            // Vérification de la géolocalisation
             $distance = $this->calculateDistance($request->lat, $request->lng, $this->targetLat, $this->targetLon);
             if ($distance > $this->radius) {
                 return response()->json(['success' => false, 'message' => "Hors zone opérationnelle (" . round($distance) . "m)."], 403);
             }
 
+            // Récupérer ou créer le pointage du jour
             $attendance = Attendance::firstOrCreate(['user_id' => $user->id, 'date' => Carbon::today()]);
-            if ($attendance->$step) return response()->json(['success' => false, 'message' => "Déjà validé."]);
+            
+            // Vérifier si déjà validé
+            if ($attendance->$step) {
+                return response()->json(['success' => false, 'message' => "Déjà validé."], 403);
+            }
 
+            // Enregistrement du pointage
             $attendance->$step = $now;
             $msg = "Pointage réussi à " . $now->format('H:i');
 
+            // Logique de fin de journée
             if ($step == 'check_out_17h00') {
                 $attendance->is_completed = true;
                 $user->notify(new AttendanceReminder("✅ Journée terminée ! Vos pointages sont validés.", route('attendances.index')));
@@ -96,14 +107,13 @@ class AttendanceController extends Controller
     }
 
     /**
-     * MÉTHODE D'AUTOMATISATION (Appelée par le Scheduler)
+     * MÉTHODE D'AUTOMATISATION (Reste inchangée, sert de backup si l'employé ne clique pas)
      */
     public static function automatePause($type)
     {
         $today = Carbon::today();
         if ($today->isWeekend()) return;
 
-        // On récupère tous les employés ayant pointé à 8h30 aujourd'hui
         $attendances = Attendance::whereDate('date', $today)
             ->whereNotNull('check_in_8h30')
             ->get();
