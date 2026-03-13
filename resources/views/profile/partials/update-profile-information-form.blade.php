@@ -36,28 +36,40 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {{-- Nom --}}
             <div>
-                <x-input-label for="name" :value="__('Nom complet')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
-                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600" :value="old('name', $user->name)" required autofocus />
-                <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                <label for="name" class="block text-gray-500 uppercase text-[10px] font-black mb-2">{{ __('Nom complet') }}</label>
+                <input id="name" name="name" type="text" 
+                    class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600 focus:border-blue-600 px-4 py-3" 
+                    value="{{ old('name', $user->name) }}" required autofocus />
+                @if($errors->has('name'))
+                    <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $errors->first('name') }}</p>
+                @endif
             </div>
 
             {{-- Email --}}
             <div>
-                <x-input-label for="email" :value="__('Email')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
-                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('email', $user->email)" required />
-                <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                <label for="email" class="block text-gray-500 uppercase text-[10px] font-black mb-2">{{ __('Email') }}</label>
+                <input id="email" name="email" type="email" 
+                    class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600 focus:border-blue-600 px-4 py-3" 
+                    value="{{ old('email', $user->email) }}" required />
+                @if($errors->has('email'))
+                    <p class="text-red-500 text-[10px] font-bold mt-2 uppercase tracking-tighter">{{ $errors->first('email') }}</p>
+                @endif
             </div>
 
             {{-- Téléphone --}}
             <div>
-                <x-input-label for="phone" :value="__('Téléphone')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
-                <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('phone', $user->phone)" />
+                <label for="phone" class="block text-gray-500 uppercase text-[10px] font-black mb-2">{{ __('Téléphone') }}</label>
+                <input id="phone" name="phone" type="text" 
+                    class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600 focus:border-blue-600 px-4 py-3" 
+                    value="{{ old('phone', $user->phone) }}" />
             </div>
 
             {{-- Adresse --}}
             <div class="md:col-span-2">
-                <x-input-label for="address" :value="__('Adresse de résidence')" class="text-gray-500 uppercase text-[10px] font-black mb-2" />
-                <x-text-input id="address" name="address" type="text" class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl" :value="old('address', $user->address)" />
+                <label for="address" class="block text-gray-500 uppercase text-[10px] font-black mb-2">{{ __('Adresse de résidence') }}</label>
+                <input id="address" name="address" type="text" 
+                    class="mt-1 block w-full bg-slate-900 border-white/5 text-white rounded-xl focus:ring-blue-600 focus:border-blue-600 px-4 py-3" 
+                    value="{{ old('address', $user->address) }}" />
             </div>
         </div>
 
