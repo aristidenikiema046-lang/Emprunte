@@ -23,6 +23,7 @@
         {{-- Score Assiduité --}}
         @php
             $isWeekend = \Carbon\Carbon::now()->isWeekend();
+            $now = \Carbon\Carbon::now();
             $quota = 3;
             $statusColor = $daysPresentCount >= $quota ? 'emerald' : ($daysPresentCount > 0 ? 'blue' : 'slate');
         @endphp
@@ -39,7 +40,6 @@
                     </span>
                 </div>
             </div>
-            {{-- Indicateurs de jours simplifiés ici... --}}
         </div>
 
         {{-- Statut Géo --}}
@@ -54,31 +54,43 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             @php
                 $steps = [
-                    'check_in_8h30'   => ['label' => 'Arrivée', 'time' => '08:30', 'auto' => false],
-                    'check_out_12h00' => ['label' => 'Pause', 'time' => '12:00', 'auto' => true],
-                    'check_in_14h00'  => ['label' => 'Reprise', 'time' => '14:00', 'auto' => true],
-                    'check_out_17h00' => ['label' => 'Descente', 'time' => '17:00', 'auto' => false],
+                    'check_in_8h30'   => ['label' => 'Arrivée', 'time' => '08:30', 'h' => 8, 'm' => 0],
+                    'check_out_12h00' => ['label' => 'Pause',   'time' => '12:00', 'h' => 12, 'm' => 0],
+                    'check_in_14h00'  => ['label' => 'Reprise', 'time' => '14:00', 'h' => 14, 'm' => 0],
+                    'check_out_17h00' => ['label' => 'Descente','time' => '17:00', 'h' => 17, 'm' => 0],
                 ];
-                $prev = true;
+                $prevDone = true; 
             @endphp
 
             @foreach($steps as $id => $info)
                 @php
                     $done = $attendance && $attendance->$id;
-                    $active = !$done && $prev && !$isWeekend && !$info['auto'];
-                    $prev = $done;
+                    // Un bouton est actif si : Pas encore fait ET (heure passée) ET (étape précédente faite)
+                    $timeReached = $now->hour >= $info['h'];
+                    $active = !$done && $timeReached && $prevDone && !$isWeekend;
+                    
+                    $prevDone = $done;
                 @endphp
+                
                 <button id="btn-{{ $id }}" 
-                    data-time="{{ $info['time'] }}"
-                    @if(!$info['auto']) onclick="submitPointage('{{ $id }}')" @endif
-                    {{ (!$active || $info['auto']) ? 'disabled' : '' }}
+                    onclick="submitPointage('{{ $id }}')"
+                    {{ !$active ? 'disabled' : '' }}
                     class="btn-pointage relative p-6 rounded-[2rem] border transition-all duration-500 flex flex-col items-center gap-2
-                    {{ $done ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' : ($info['auto'] ? 'bg-slate-800/40 border-slate-700/50 text-slate-500' : ($active ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-950/50 border-slate-900 text-slate-800 opacity-20')) }}">
+                    {{ $done 
+                        ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-400' 
+                        : ($active 
+                            ? 'bg-slate-900 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                            : 'bg-slate-950/50 border-slate-900 text-slate-800 opacity-20') }}">
                     
                     <span class="text-[8px] font-black uppercase tracking-widest">{{ $info['label'] }}</span>
                     <span class="text-2xl font-black font-mono">{{ $done ? \Carbon\Carbon::parse($attendance->$id)->format('H:i') : $info['time'] }}</span>
+                    
                     <span class="status-label text-[8px] font-bold italic uppercase">
-                        @if($done) ✅ Terminé @elseif($info['auto']) 🤖 Automatique @elseif($active) 👉 Cliquer @else Verrouillé @endif
+                        @if($done) ✅ Validé 
+                        @elseif($active) ⚡ Cliquer 
+                        @elseif(!$timeReached) ⏳ Attendre {{ $info['time'] }}
+                        @else 🔒 Verrouillé 
+                        @endif
                     </span>
                 </button>
             @endforeach
@@ -86,7 +98,6 @@
     </div>
 
     <script>
-        // Logique JS identique (Horloge, Géo, Submit)
         let uLat, uLng;
         const TARGET = { lat: 5.365237, lon: -3.957816 };
         
@@ -110,7 +121,7 @@
                     s.className = `mb-8 p-4 rounded-2xl border text-[10px] font-black uppercase flex items-center gap-3 transition-all ${ok ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`;
                     s.innerHTML = `<div class="w-2 h-2 rounded-full ${ok?'bg-emerald-500 animate-pulse':'bg-red-500'}"></div><span>${ok?'✅ Zone de travail':'❌ Hors zone'} (${Math.round(dist)}m)</span>`;
                 }
-            });
+            }, null, {enableHighAccuracy:true});
         }
 
         function calculateDistance(la1, lo1, la2, lo2) {
@@ -119,6 +130,8 @@
         }
 
         function submitPointage(step) {
+            if(!uLat || !uLng) return alert("Attente du signal GPS...");
+            
             fetch("{{ route('attendances.store') }}", {
                 method:'POST',
                 headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{csrf_token()}}','Accept':'application/json'},
