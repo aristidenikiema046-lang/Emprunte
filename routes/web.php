@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\Admin\AttendanceOverviewController; // Import du nouveau contrôleur Admin
+use App\Http\Controllers\Admin\AttendanceOverviewController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PayrollController;
@@ -54,10 +54,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.updateProgress');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
-    // --- Congés ---
+    // --- Congés (MODIFIÉ ICI) ---
     Route::get('/leaves', [LeaveController::class, 'index'])->name('leaves.index');
     Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
-    Route::patch('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.update');
+    // Changement de 'leaves.update' en 'leaves.updateStatus' pour correspondre à la vue
+    Route::patch('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.updateStatus');
 
     // --- PAIE ---
     Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index'); 
@@ -74,13 +75,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::patch('/admin/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
         
-        // On peut aussi garder une route explicite pour la supervision si besoin
         Route::get('/admin/attendances', [AttendanceOverviewController::class, 'index'])->name('admin.attendances.index');
     });
 
     // --- Communication ---
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    // ... (le reste de tes routes messages reste identique)
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::patch('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
@@ -103,7 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/sent', [DocumentController::class, 'sent'])->name('sent');
         Route::get('/create', [DocumentController::class, 'create'])->name('create');
         Route::post('/', [DocumentController::class, 'store'])->name('store');
-        Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
+        @Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
     });
 
     // --- Évaluations ---
