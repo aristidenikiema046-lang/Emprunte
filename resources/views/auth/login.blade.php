@@ -6,7 +6,6 @@
     <title>Connexion - Emprunte</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Cohérence avec le style Emprunte */
         .btn-emprunte {
             background-color: #4f46e5 !important;
             transition: all 0.3s ease;
@@ -30,7 +29,17 @@
 <body class="bg-gray-100 font-sans antialiased">
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
         
-        <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
+        {{-- Bouton de redirection externe (Retour Accueil) --}}
+        <div class="w-full sm:max-w-md mb-4 px-2">
+            <a href="/" class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-indigo-600 transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Retour au site
+            </a>
+        </div>
+
+        <div class="w-full sm:max-w-md px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
             
             <div class="mb-6 text-center">
                 <h2 class="text-2xl font-bold text-gray-800">Connexion</h2>
