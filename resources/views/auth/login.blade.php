@@ -16,8 +16,16 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
+        /* Style pour le bouton de retour plein */
+        .btn-retour {
+            background-color: #334155; /* Slate 700 */
+            transition: all 0.3s ease;
+        }
+        .btn-retour:hover {
+            background-color: #1e293b; /* Slate 800 */
+            transform: translateX(-3px);
+        }
         .text-emprunte { color: #4f46e5; }
-        
         .input-emprunte:focus {
             border-color: #4f46e5 !important;
             outline: none;
@@ -27,85 +35,79 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 px-4">
         
-        {{-- Bouton de redirection externe (Retour Accueil) --}}
-        <div class="w-full sm:max-w-md mb-4 px-2">
-            <a href="/" class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-indigo-600 transition">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Retour au site
-            </a>
-        </div>
-
-        <div class="w-full sm:max-w-md px-6 py-8 bg-white shadow-md overflow-hidden sm:rounded-lg">
+        <div class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-xl overflow-hidden sm:rounded-2xl border border-gray-100">
             
-            <div class="mb-6 text-center">
-                <h2 class="text-2xl font-bold text-gray-800">Connexion</h2>
-                <p class="text-sm text-gray-600">Heureux de vous revoir sur <span class="text-emprunte font-bold">Emprunte</span></p>
+            {{-- Bouton de redirection plein en haut --}}
+            <div class="mb-8">
+                <a href="{{ url('/accueil') }}" class="btn-retour inline-flex items-center px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest shadow-md">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Retour à l'accueil
+                </a>
+            </div>
+
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-black text-gray-900 tracking-tighter uppercase italic">Connexion</h2>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">
+                    Accédez à votre espace <span class="text-emprunte">Emprunte</span>
+                </p>
             </div>
 
             @if (session('status'))
-                <div class="mb-4 font-medium text-sm text-green-600">
+                <div class="mb-4 font-medium text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
                     {{ session('status') }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
                 @csrf
 
                 <div>
-                    <label for="email" class="block font-semibold text-sm text-gray-700">Adresse Email</label>
+                    <label for="email" class="block font-black text-[10px] text-gray-400 uppercase tracking-widest mb-2">Identifiant Email</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" 
-                        class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm input-emprunte p-2 border" 
-                        required autofocus autocomplete="username" />
-                    @if ($errors->get('email'))
-                        <ul class="text-sm text-red-600 space-y-1 mt-2">
-                            @foreach ((array) $errors->get('email') as $message)
-                                <li>{{ $message }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
+                        class="block w-full bg-gray-50 border-gray-200 rounded-xl shadow-sm input-emprunte p-3 border text-sm" 
+                        placeholder="nom@exemple.com" required autofocus />
+                    @error('email')
+                        <p class="text-[10px] text-red-600 font-black uppercase mt-2 tracking-tighter">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="mt-4">
-                    <label for="password" class="block font-semibold text-sm text-gray-700">Mot de passe</label>
+                <div>
+                    <label for="password" class="block font-black text-[10px] text-gray-400 uppercase tracking-widest mb-2">Mot de passe</label>
                     <input id="password" type="password" name="password" 
-                        class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm input-emprunte p-2 border" 
-                        required autocomplete="current-password" />
-                    @if ($errors->get('password'))
-                        <ul class="text-sm text-red-600 space-y-1 mt-2">
-                            @foreach ((array) $errors->get('password') as $message)
-                                <li>{{ $message }}</li>
-                            @endforeach
-                        </ul>
+                        class="block w-full bg-gray-50 border-gray-200 rounded-xl shadow-sm input-emprunte p-3 border text-sm" 
+                        placeholder="••••••••" required />
+                    @error('password')
+                        <p class="text-[10px] text-red-600 font-black uppercase mt-2 tracking-tighter">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label for="remember_me" class="inline-flex items-center">
+                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 w-4 h-4" name="remember">
+                        <span class="ms-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Rester connecté</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <a class="text-[10px] font-black text-gray-400 hover:text-indigo-600 uppercase tracking-widest transition" href="{{ route('password.request') }}">
+                            Oubli ?
+                        </a>
                     @endif
                 </div>
 
-                <div class="block mt-4">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                        <span class="ms-2 text-sm text-gray-600">Se souvenir de moi</span>
-                    </label>
+                <div class="pt-4">
+                    <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-4 btn-emprunte rounded-xl font-black text-xs text-white uppercase tracking-[0.2em] shadow-lg shadow-indigo-200">
+                        S'identifier
+                    </button>
                 </div>
 
-                <div class="flex flex-col items-center justify-end mt-6 space-y-4">
-                    <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-3 btn-emprunte border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        Se connecter
-                    </button>
-
-                    <div class="flex flex-col items-center space-y-2">
-                        @if (Route::has('password.request'))
-                            <a class="underline text-sm text-gray-600 hover:text-indigo-600 rounded-md focus:outline-none" href="{{ route('password.request') }}">
-                                Mot de passe oublié ?
-                            </a>
-                        @endif
-
-                        <a class="text-sm text-gray-600 hover:text-indigo-600 font-medium" href="{{ route('register') }}">
-                            Pas encore de compte ? <span class="text-emprunte font-bold">Créer un compte</span>
-                        </a>
-                    </div>
+                <div class="text-center pt-6 border-t border-gray-50">
+                    <a class="text-[10px] font-bold text-gray-400 hover:text-indigo-600 uppercase tracking-widest transition" href="{{ route('register') }}">
+                        Nouveau ici ? <span class="text-emprunte font-black underline">Créer un compte</span>
+                    </a>
                 </div>
             </form>
         </div>
