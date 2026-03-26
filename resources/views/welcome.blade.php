@@ -13,12 +13,10 @@
     
     <nav class="fixed w-full z-50 backdrop-blur-lg border-b border-slate-800 bg-[#0f172a]/80">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <span class="text-white font-black text-xl italic">E</span>
-                </div>
-                <span class="text-xl font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
-            </div>
+            
+            <a href="{{ url('/') }}" class="flex items-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo Emprunte" class="h-10 w-auto transition-transform hover:scale-105">
+            </a>
 
             <div class="flex items-center gap-6">
                 @if (Route::has('login'))
@@ -157,10 +155,7 @@
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
             <div class="col-span-1 md:col-span-2">
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-xl shadow-indigo-500/20">
-                        <span class="text-white font-black text-lg italic">E</span>
-                    </div>
-                    <span class="text-2xl font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo Emprunte" class="h-8 w-auto opacity-80 hover:opacity-100 transition">
                 </div>
                 <p class="text-slate-500 text-sm max-w-sm leading-relaxed font-medium">
                     La plateforme de pilotage nouvelle génération pour les entreprises qui exigent performance, transparence et rapidité.
@@ -189,15 +184,12 @@
                 &copy; {{ date('Y') }} Emprunte System. Engineered for Speed.
             </p>
             <div class="flex items-center gap-8 developer-signature-wrapper">
-                {{-- SIGNATURE DU DEVELOPPEUR (MODIFIABLE) --}}
                 <a href="#" target="_blank" class="flex items-center gap-2 group developer-credit-link">
                     <span class="text-slate-700 text-[9px] font-bold uppercase tracking-widest group-hover:text-indigo-500 transition-colors dev-label">Build by</span>
                     <div class="w-7 h-7 bg-slate-800 border border-slate-700 rounded-lg flex items-center justify-center shadow-inner group-hover:border-indigo-600 group-hover:bg-indigo-950/50 transition-all dev-logo-box">
-                        {{-- Icône/Initiales du développeur --}}
                         <span class="text-white font-black text-xs group-hover:text-indigo-400 transition-colors dev-initials">D<span class="text-indigo-500">V</span></span>
                     </div>
                 </a>
-                {{-- Icônes Réseaux Sociaux --}}
                 <div class="flex gap-8 social-icons-wrapper">
                     <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-linkedin"></i></a>
                     <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-github"></i></a>

@@ -14,8 +14,8 @@
         <div class="flex h-screen overflow-hidden bg-slate-950">
             
             <nav class="w-64 bg-gray-900 text-white flex flex-col border-r border-gray-800">
-                <div class="p-6 text-2xl font-bold border-b border-gray-800 flex items-center gap-3">
-                    <span class="bg-blue-600 p-2 rounded-lg text-xs italic">YA</span> Emprunte
+                <div class="p-6 border-b border-gray-800 flex justify-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo Emprunte" class="h-10 w-auto">
                 </div>
                 
                 <div class="flex-1 overflow-y-auto py-4">
@@ -75,7 +75,6 @@
                     </div>
 
                     <div class="flex items-center gap-6">
-                        {{-- CLOCHE DE NOTIFICATIONS --}}
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="relative text-gray-400 hover:text-white transition-colors">
                                 <i class="fa-solid fa-bell text-lg"></i>
@@ -113,7 +112,6 @@
                             </div>
                         </div>
 
-                        {{-- BLOC PROFIL --}}
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="focus:outline-none flex items-center gap-3">
                                 <div class="text-right hidden md:block border-r border-gray-800 pr-4">
