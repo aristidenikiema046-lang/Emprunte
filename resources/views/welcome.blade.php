@@ -184,13 +184,24 @@
             </div>
         </div>
         
-        <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-8">
-            <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.4em]">
+        <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-8 social-credits-container">
+            <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.4em] copyright-text">
                 &copy; {{ date('Y') }} Emprunte System. Engineered for Speed.
             </p>
-            <div class="flex gap-8">
-                <a href="#" class="text-slate-500 hover:text-white transition-all scale-125"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#" class="text-slate-500 hover:text-white transition-all scale-125"><i class="fa-brands fa-github"></i></a>
+            <div class="flex items-center gap-8 developer-signature-wrapper">
+                {{-- SIGNATURE DU DEVELOPPEUR (MODIFIABLE) --}}
+                <a href="#" target="_blank" class="flex items-center gap-2 group developer-credit-link">
+                    <span class="text-slate-700 text-[9px] font-bold uppercase tracking-widest group-hover:text-indigo-500 transition-colors dev-label">Build by</span>
+                    <div class="w-7 h-7 bg-slate-800 border border-slate-700 rounded-lg flex items-center justify-center shadow-inner group-hover:border-indigo-600 group-hover:bg-indigo-950/50 transition-all dev-logo-box">
+                        {{-- Icône/Initiales du développeur --}}
+                        <span class="text-white font-black text-xs group-hover:text-indigo-400 transition-colors dev-initials">D<span class="text-indigo-500">V</span></span>
+                    </div>
+                </a>
+                {{-- Icônes Réseaux Sociaux --}}
+                <div class="flex gap-8 social-icons-wrapper">
+                    <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-github"></i></a>
+                </div>
             </div>
         </div>
     </footer>
