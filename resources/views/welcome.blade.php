@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ManageX | Pilotage d'Entreprise</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -14,9 +20,12 @@
     <nav class="fixed w-full z-50 backdrop-blur-lg border-b border-slate-800 bg-[#0f172a]/80">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             
-            <a href="{{ url('/') }}" class="flex items-center">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo Emprunte" class="h-10 w-auto transition-transform hover:scale-105">
-            </a>
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <span class="text-white font-black text-xl italic">E</span>
+                </div>
+                <span class="text-xl font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
+            </div>
 
             <div class="flex items-center gap-6">
                 @if (Route::has('login'))
@@ -95,108 +104,22 @@
                 </div>
             </div>
         </section>
-
-        <section id="features" class="py-32 px-6 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-10 bg-slate-900/40 border border-slate-800 rounded-[3rem] hover:border-indigo-500/50 transition-all group relative overflow-hidden">
-                    <div class="w-14 h-14 bg-indigo-600/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-clock-rotate-left text-indigo-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-white mb-4 uppercase italic">Pointage Temps Réel</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed font-medium">Suivez les arrivées et départs de vos collaborateurs d'un simple clic. Statuts en direct pour l'administrateur.</p>
-                </div>
-
-                <div class="p-10 bg-slate-900/40 border border-slate-800 rounded-[3rem] hover:border-blue-500/50 transition-all group relative overflow-hidden">
-                    <div class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-list-check text-blue-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-white mb-4 uppercase italic">Gestion de Missions</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed font-medium">Assignez des tâches, suivez la progression en pourcentage et gérez les priorités de manière dynamique.</p>
-                </div>
-
-                <div class="p-10 bg-slate-900/40 border border-slate-800 rounded-[3rem] hover:border-emerald-500/50 transition-all group relative overflow-hidden">
-                    <div class="w-14 h-14 bg-emerald-600/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-comments text-emerald-500 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-white mb-4 uppercase italic">Communication</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed font-medium">Discutez en direct avec vos équipes, partagez des fichiers et modifiez vos messages instantanément.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-32 bg-slate-900/20 rounded-[4rem] mx-4 border border-slate-800/50">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-20">
-                    <h2 class="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">Déploiement en <span class="text-indigo-500">3 étapes</span></h2>
-                    <div class="h-1.5 w-20 bg-indigo-600 mx-auto mt-6 rounded-full"></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
-                    <div class="text-center group">
-                        <div class="w-16 h-16 bg-slate-800 border-2 border-slate-700 rounded-3xl flex items-center justify-center text-white text-xl font-black mx-auto mb-8 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all rotate-3 group-hover:rotate-0 shadow-2xl italic">01</div>
-                        <h4 class="text-white font-black uppercase text-sm tracking-widest mb-4">Inscription</h4>
-                        <p class="text-slate-500 text-xs font-bold leading-loose uppercase tracking-tighter">Soumettez votre demande d'accès via notre formulaire sécurisé.</p>
-                    </div>
-                    <div class="text-center group">
-                        <div class="w-16 h-16 bg-slate-800 border-2 border-slate-700 rounded-3xl flex items-center justify-center text-white text-xl font-black mx-auto mb-8 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all -rotate-3 group-hover:rotate-0 shadow-2xl italic">02</div>
-                        <h4 class="text-white font-black uppercase text-sm tracking-widest mb-4">Configuration</h4>
-                        <p class="text-slate-500 text-xs font-bold leading-loose uppercase tracking-tighter">Nos administrateurs valident et configurent votre instance privée.</p>
-                    </div>
-                    <div class="text-center group">
-                        <div class="w-16 h-16 bg-slate-800 border-2 border-slate-700 rounded-3xl flex items-center justify-center text-white text-xl font-black mx-auto mb-8 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all rotate-6 group-hover:rotate-0 shadow-2xl italic">03</div>
-                        <h4 class="text-white font-black uppercase text-sm tracking-widest mb-4">Pilotage</h4>
-                        <p class="text-slate-500 text-xs font-bold leading-loose uppercase tracking-tighter">Accédez à votre tableau de bord et commencez la gestion RH.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer class="pt-32 pb-12 border-t border-slate-800/50 mt-20">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
-            <div class="col-span-1 md:col-span-2">
-                <div class="flex items-center gap-3 mb-8">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo Emprunte" class="h-8 w-auto opacity-80 hover:opacity-100 transition">
-                </div>
-                <p class="text-slate-500 text-sm max-w-sm leading-relaxed font-medium">
-                    La plateforme de pilotage nouvelle génération pour les entreprises qui exigent performance, transparence et rapidité.
-                </p>
-            </div>
-            <div>
-                <h4 class="text-white font-black mb-8 text-[10px] uppercase tracking-[0.3em]">Navigation</h4>
-                <ul class="space-y-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Plateforme</a></li>
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Sécurité</a></li>
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Documentation</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-black mb-8 text-[10px] uppercase tracking-[0.3em]">Support</h4>
-                <ul class="space-y-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Contact</a></li>
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Légal</a></li>
-                    <li><a href="#" class="hover:text-indigo-400 transition-colors">Statut API</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-8 social-credits-container">
-            <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.4em] copyright-text">
+        <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p class="text-slate-600 text-[10px] font-black uppercase tracking-[0.4em]">
                 &copy; {{ date('Y') }} Emprunte System. Engineered for Speed.
             </p>
-            <div class="flex items-center gap-8 developer-signature-wrapper">
-                <a href="#" target="_blank" class="flex items-center gap-2 group developer-credit-link">
-                    <span class="text-slate-700 text-[9px] font-bold uppercase tracking-widest group-hover:text-indigo-500 transition-colors dev-label">Build by</span>
-                    <div class="w-7 h-7 bg-slate-800 border border-slate-700 rounded-lg flex items-center justify-center shadow-inner group-hover:border-indigo-600 group-hover:bg-indigo-950/50 transition-all dev-logo-box">
-                        <span class="text-white font-black text-xs group-hover:text-indigo-400 transition-colors dev-initials">D<span class="text-indigo-500">V</span></span>
+            <div class="flex items-center gap-3">
+                 <div class="flex items-center gap-2 opacity-50">
+                    <div class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center">
+                        <span class="text-white font-black text-[10px] italic">E</span>
                     </div>
-                </a>
-                <div class="flex gap-8 social-icons-wrapper">
-                    <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="#" target="_blank" class="text-slate-500 hover:text-white transition-all scale-125 hover:scale-150"><i class="fa-brands fa-github"></i></a>
+                    <span class="text-xs font-black tracking-tighter text-white uppercase italic">EmpruntE</span>
                 </div>
             </div>
         </div>
     </footer>
-
 </body>
 </html>
