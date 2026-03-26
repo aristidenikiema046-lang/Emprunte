@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Demander un accès - Emprunte</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
     <style>
         body { background-color: #0f172a; }
         .auth-container {
@@ -14,6 +15,28 @@
             border: 1px solid #334155;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
+        
+        /* Bouton Retour Accueil */
+        .btn-home {
+            background-color: #334155;
+            color: white !important;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.6rem;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        .btn-home:hover {
+            background-color: #475569;
+            transform: translateX(-4px);
+        }
+
         .btn-emprunte {
             background-color: #4f46e5 !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,6 +59,7 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
         }
+        
         .input-emprunte {
             background-color: #0f172a !important;
             border: 1px solid #334155 !important;
@@ -51,6 +75,7 @@
             outline: none;
             box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4);
         }
+        
         .label-style {
             display: block;
             font-weight: 900;
@@ -66,6 +91,12 @@
 <body class="antialiased font-sans flex items-center justify-center min-h-screen p-4">
 
     <div class="auth-container w-full max-w-md">
+        
+        <a href="{{ url('/') }}" class="btn-home">
+            <i class="fa-solid fa-house mr-2"></i>
+            Retour à l'accueil
+        </a>
+
         <div class="mb-10 text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl mb-4 shadow-xl shadow-indigo-500/20">
                 <span class="text-white text-3xl font-black italic">E</span>
