@@ -6,7 +6,7 @@
                 {{-- SIDEBAR : LISTE DES CONTACTS --}}
                 <div class="w-80 bg-[#1e293b]/50 backdrop-blur-xl rounded-[2.5rem] border border-slate-800 p-6 flex flex-col shadow-2xl">
                     <div class="flex items-center justify-between mb-8 px-2">
-                        <h3 class="text-2xl font-black italic tracking-tighter uppercase text-white">Inbox</h3>
+                        <h3 class="text-2xl font-black italic tracking-tighter uppercase text-white">Messagerie</h3>
                         <span class="bg-indigo-500/10 text-indigo-400 text-[10px] font-black px-3 py-1 rounded-full border border-indigo-500/20">
                             {{ $users->count() }} MEMBRES
                         </span>
