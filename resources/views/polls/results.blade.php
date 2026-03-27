@@ -1,30 +1,87 @@
 <x-app-layout>
-    <div class="py-12 bg-[#0f172a] min-h-screen text-white">
-        <div class="max-w-3xl mx-auto px-4">
-            <div class="bg-[#1e293b] p-8 rounded-[2.5rem] border border-slate-700 shadow-2xl">
-                <div class="flex justify-between items-start mb-10">
-                    <div>
-                        <h2 class="text-2xl font-black italic tracking-tighter uppercase">{{ $poll->title }}</h2>
-                        <p class="text-slate-500 font-bold text-xs mt-1">{{ $totalVotes }} participants au total</p>
-                    </div>
-                    <a href="{{ route('polls.index') }}" class="text-slate-400 hover:text-white text-sm font-bold underline">Retour</a>
-                </div>
+    <div class="py-12 min-h-screen text-slate-200" style="background-color: #020617;">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex justify-between items-center mb-12">
+                <a href="{{ route('polls.index') }}" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-indigo-400 transition-colors">
+                    <i class="fa-solid fa-arrow-left-long"></i> Retour
+                </a>
+                <span class="px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase text-indigo-400 tracking-widest">
+                    {{ $totalVotes }} {{ Str::plural('Vote', $totalVotes) }} au total
+                </span>
+            </div>
 
-                <div class="space-y-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-black italic tracking-tighter text-white uppercase">
+                    Résultats <span class="text-indigo-500 inline-block rotate-3">Live</span>
+                </h2>
+                <p class="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] mt-3">
+                    {{ $poll->title }}
+                </p>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
+                {{-- Décoration de fond --}}
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/5 blur-[100px] rounded-full"></div>
+                
+                <div class="space-y-8 relative">
                     @foreach($stats as $stat)
-                    <div>
-                        <div class="flex justify-between mb-2 text-sm font-bold uppercase tracking-widest">
-                            <span class="text-slate-300">{{ $stat['option'] }}</span>
-                            <span class="text-indigo-400">{{ $stat['percentage'] }}%</span>
+                        <div class="group">
+                            <div class="flex justify-between items-end mb-3 px-2">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-black uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors">
+                                        {{ $stat['option'] }}
+                                    </span>
+                                    <span class="text-[10px] font-bold text-gray-600">
+                                        {{ $stat['count'] }} voix
+                                    </span>
+                                </div>
+                                <span class="text-xl font-black italic tracking-tighter text-indigo-500">
+                                    {{ $stat['percentage'] }}%
+                                </span>
+                            </div>
+                            
+                            {{-- Barre de progression --}}
+                            <div class="h-4 w-full bg-gray-950 border border-gray-800 rounded-full p-1 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-indigo-600 to-violet-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+                                     style="width: {{ $stat['percentage'] }}%">
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full bg-[#0f172a] rounded-full h-4 overflow-hidden border border-slate-800">
-                            <div class="bg-indigo-500 h-full rounded-full transition-all duration-1000" style="width: {{ $stat['percentage'] }}%"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-500 mt-1 ml-1">{{ $stat['count'] }} votes</p>
-                    </div>
                     @endforeach
                 </div>
             </div>
+
+            {{-- Footer d'analyse --}}
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-3xl flex items-center gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-widest text-gray-600">Lancé le</p>
+                        <p class="text-sm font-bold text-gray-300">{{ $poll->created_at->format('d F Y') }}</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-3xl flex items-center gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black uppercase tracking-widest text-gray-600">Confidentialité</p>
+                        <p class="text-sm font-bold text-gray-300">Identités protégées</p>
+                    </div>
+                </div>
+            </div>
+
+            @if(auth()->user()->can('admin-only'))
+                <div class="mt-10 text-center">
+                    <button class="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500/50 hover:text-rose-500 transition-colors">
+                        <i class="fa-solid fa-circle-stop mr-2"></i> Clôturer les votes
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>
