@@ -54,10 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.updateProgress');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
-    // --- Congés (MODIFIÉ ICI) ---
+    // --- Congés ---
     Route::get('/leaves', [LeaveController::class, 'index'])->name('leaves.index');
     Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
-    // Changement de 'leaves.update' en 'leaves.updateStatus' pour correspondre à la vue
     Route::patch('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.updateStatus');
 
     // --- PAIE ---
@@ -84,16 +83,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
 
-    // --- Sondages ---
+    // --- Sondages (CORRIGÉ) ---
     Route::prefix('polls')->name('polls.')->group(function () {
         Route::get('/', [PollController::class, 'index'])->name('index');
-        Route::get('/{poll}', [PollController::class, 'show'])->name('show');
-        Route::post('/{poll}/vote', [PollController::class, 'vote'])->name('vote');
 
+        // Les routes spécifiques (Admin) doivent être AVANT les routes avec paramètres {poll}
         Route::middleware('can:admin-only')->group(function() {
             Route::get('/create', [PollController::class, 'create'])->name('create');
             Route::post('/', [PollController::class, 'store'])->name('store');
         });
+
+        // Les routes dynamiques en dernier
+        Route::get('/{poll}', [PollController::class, 'show'])->name('show');
+        Route::post('/{poll}/vote', [PollController::class, 'vote'])->name('vote');
+        Route::get('/{poll}/results', [PollController::class, 'results'])->name('results'); // Ajout pour la vue index
     });
 
     // --- Documents ---
@@ -102,7 +105,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/sent', [DocumentController::class, 'sent'])->name('sent');
         Route::get('/create', [DocumentController::class, 'create'])->name('create');
         Route::post('/', [DocumentController::class, 'store'])->name('store');
-        @Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
+        Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
     });
 
     // --- Évaluations ---
