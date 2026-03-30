@@ -10,8 +10,10 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         
-        <link rel="manifest" href="{{ asset('manifest.json') }}">
-        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+        {{-- Remplacement par les URLs complètes --}}
+        <link rel="manifest" href="{{ url('/manifest.json') }}">
+        <link rel="icon" type="image/png" href="{{ url('/images/favicon.png') }}">
+        <link rel="apple-touch-icon" href="{{ url('/images/favicon.png') }}">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -21,7 +23,6 @@
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    // Utilisation de asset() pour pointer au bon endroit
                     navigator.serviceWorker.register("{{ asset('sw.js') }}")
                         .then(reg => console.log('SW OK'))
                         .catch(err => console.log('SW Erreur', err));
