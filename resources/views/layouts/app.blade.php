@@ -7,6 +7,10 @@
 
         <title>{{ config('app.name', 'ManageX') }}</title>
 
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="manifest" href="/manifest.json">
+
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%234f46e5'/><text x='50%' y='54%' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-style='italic' font-size='65'>E</text></svg>">
         <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%234f46e5'/><text x='50%' y='54%' dominant-baseline='central' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-style='italic' font-size='65'>E</text></svg>">
 
@@ -14,6 +18,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <script src="https://cdn.tailwindcss.com"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js');
+                });
+            }
+        </script>
     </head>
     <body class="font-sans antialiased text-slate-200" style="background-color: #020617;">
         <div class="flex h-screen overflow-hidden bg-slate-950">
