@@ -121,7 +121,7 @@
                             <div class="w-32 h-32 bg-[#0f172a] rounded-[3rem] flex items-center justify-center shadow-inner border border-slate-800 mb-6">
                                 <svg class="w-12 h-12 text-slate-700 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                             </div>
-                            <h3 class="text-xl font-black uppercase tracking-tighter text-slate-400">Messagerie ManageX</h3>
+                            <h3 class="text-xl font-black uppercase tracking-tighter text-slate-400">Messagerie Emprunte</h3>
                             <p class="text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-40 italic text-center px-10">Sélectionnez un membre pour démarrer une conversation cryptée</p>
                         </div>
                     @endif
