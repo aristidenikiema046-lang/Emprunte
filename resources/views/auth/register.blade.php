@@ -88,20 +88,20 @@
         }
     </style>
 </head>
-<body class="antialiased font-sans flex items-center justify-center min-h-screen p-4">
+<body class="antialiased font-sans flex items-center justify-center min-h-screen p-4 sm:p-6">
 
-    <div class="auth-container w-full max-w-md">
+    <div class="auth-container w-full max-w-lg px-6 py-8 sm:p-10">
         
         <a href="{{ url('/') }}" class="btn-home">
             <i class="fa-solid fa-house mr-2"></i>
             Retour à l'accueil
         </a>
 
-        <div class="mb-10 text-center">
+        <div class="mb-8 sm:mb-10 text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl mb-4 shadow-xl shadow-indigo-500/20">
                 <span class="text-white text-3xl font-black italic">E</span>
             </div>
-            <h2 class="text-2xl font-black text-white tracking-tighter uppercase italic">Demander un accès</h2>
+            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tighter uppercase italic">Demander un accès</h2>
             <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">
                 Rejoignez l'écosystème <span class="text-indigo-500">Emprunte</span>
             </p>
@@ -131,7 +131,7 @@
             </div>
 
             {{-- Passwords --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="password" class="label-style">Mot de passe</label>
                     <input id="password" type="password" name="password" class="input-emprunte" placeholder="••••••••" required />
@@ -145,7 +145,7 @@
                 <p class="text-red-400 text-[10px] font-bold uppercase mt-1 ml-1">{{ $errors->first('password') }}</p>
             @endif
 
-            <div class="flex flex-col items-center justify-end mt-10 space-y-6">
+            <div class="flex flex-col items-center justify-end mt-8 sm:mt-10 space-y-6">
                 <button type="submit" class="btn-emprunte shadow-lg shadow-indigo-500/20">
                     Envoyer ma demande
                 </button>

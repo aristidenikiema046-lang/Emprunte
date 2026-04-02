@@ -8,10 +8,8 @@
         </p>
     </header>
 
-    <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition"
+    <button type="button" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition"
         x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
         {{ __('Supprimer le compte') }}
     </button>
-
-    {{-- Note: Si ton système de Modal (x-modal) plante aussi, il faudra remplacer la modal par un simple formulaire de confirmation --}}
 </section>

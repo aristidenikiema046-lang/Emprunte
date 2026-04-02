@@ -3,18 +3,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             {{-- En-tête --}}
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-clock-rotate-left text-blue-500 text-xs"></i>
                         <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">Priorité Échéance</span>
                     </div>
-                    <h2 class="text-4xl font-black italic tracking-tighter text-white uppercase">
+                    <h2 class="text-3xl sm:text-4xl font-black italic tracking-tighter text-white uppercase">
                         Suivi des <span class="text-blue-600">Missions</span>
                     </h2>
                 </div>
                 
-                <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800 shadow-2xl flex items-center gap-4">
+                <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800 shadow-2xl flex items-center gap-4 w-full sm:w-auto">
                     <div class="p-3 bg-blue-600/10 rounded-xl border border-blue-500/20">
                         <i class="fa-solid fa-list-check text-blue-500"></i>
                     </div>
@@ -29,12 +29,12 @@
 
             {{-- Formulaire Admin --}}
             @if(auth()->user()->role === 'admin')
-            <div class="bg-gray-900 border border-gray-800 p-8 rounded-[2.5rem] shadow-2xl mb-12">
+            <div class="bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl mb-12">
                 <h3 class="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
                     <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                     Nouvelle Mission avec Délai
                 </h3>
-                <form action="{{ route('tasks.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <form action="{{ route('tasks.store') }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @csrf
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-500 uppercase">Collaborateur</label>
@@ -69,29 +69,29 @@
                     $isOverdue = !$task->is_completed && \Carbon\Carbon::parse($task->due_date)->isPast();
                 @endphp
                 <div class="group bg-gray-900/40 p-1 rounded-[2rem] border {{ $isOverdue ? 'border-red-500/50' : 'border-gray-800/50 hover:border-blue-500/50' }} transition-all duration-500">
-                    <div class="bg-gray-900 p-6 rounded-[1.9rem] flex flex-col lg:flex-row justify-between items-center gap-8">
+                    <div class="bg-gray-900 p-5 sm:p-6 rounded-[1.9rem] flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
                         
                         {{-- Icone/Status --}}
-                        <div class="flex items-center gap-6 w-full lg:w-1/3">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center border-2 {{ $task->is_completed ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ($isOverdue ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-500/10 border-blue-500/20 text-blue-500') }}">
+                        <div class="flex items-center gap-4 sm:gap-6 w-full lg:w-1/3">
+                            <div class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center border-2 {{ $task->is_completed ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : ($isOverdue ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-blue-500/10 border-blue-500/20 text-blue-500') }}">
                                 @if($task->is_completed)
-                                    <i class="fa-solid fa-check-double text-xl"></i>
+                                    <i class="fa-solid fa-check-double text-lg sm:text-xl"></i>
                                 @elseif($isOverdue)
-                                    <i class="fa-solid fa-triangle-exclamation text-xl animate-bounce"></i>
+                                    <i class="fa-solid fa-triangle-exclamation text-lg sm:text-xl animate-bounce"></i>
                                 @else
-                                    <span class="font-black text-sm">{{ $task->progress }}%</span>
+                                    <span class="font-black text-xs sm:text-sm">{{ $task->progress }}%</span>
                                 @endif
                             </div>
-                            <div>
-                                <h3 class="font-bold text-base {{ $task->is_completed ? 'text-gray-600 line-through' : 'text-white' }}">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-bold text-sm sm:text-base truncate {{ $task->is_completed ? 'text-gray-600 line-through' : 'text-white' }}">
                                     {{ $task->title }}
                                 </h3>
-                                <div class="flex flex-wrap items-center gap-3 mt-1">
-                                    <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-[8px] sm:text-[9px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
                                         {{ $task->user?->name ?? 'N/A' }}
                                     </span>
                                     @if($task->due_date)
-                                        <span class="text-[9px] font-black uppercase tracking-widest flex items-center gap-1 {{ $isOverdue ? 'text-red-500' : 'text-gray-500' }}">
+                                        <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest flex items-center gap-1 {{ $isOverdue ? 'text-red-500' : 'text-gray-500' }}">
                                             <i class="fa-regular fa-clock"></i>
                                             {{ \Carbon\Carbon::parse($task->due_date)->format('d/m H:i') }}
                                         </span>
@@ -101,14 +101,14 @@
                         </div>
 
                         {{-- Progression --}}
-                        <div class="w-full lg:flex-1 px-4">
+                        <div class="w-full lg:flex-1 px-0 sm:px-4">
                             @if(auth()->id() == $task->user_id && !$task->is_completed)
-                                <div class="flex gap-2">
+                                <div class="grid grid-cols-4 gap-2">
                                     @foreach([25, 50, 75, 100] as $step)
-                                        <form action="{{ route('tasks.updateProgress', $task) }}" method="POST" class="flex-1">
+                                        <form action="{{ route('tasks.updateProgress', $task) }}" method="POST">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="progress" value="{{ $step }}">
-                                            <button type="submit" class="w-full py-2 rounded-xl border text-[10px] font-black transition-all {{ $task->progress == $step ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-gray-950 border-gray-800 text-gray-500 hover:text-white hover:border-blue-500' }}">
+                                            <button type="submit" class="w-full py-2 rounded-xl border text-[9px] sm:text-[10px] font-black transition-all {{ $task->progress == $step ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-gray-950 border-gray-800 text-gray-500 hover:text-white hover:border-blue-500' }}">
                                                 {{ $step }}%
                                             </button>
                                         </form>
@@ -122,10 +122,10 @@
                         </div>
 
                         {{-- Actions --}}
-                        <div class="flex items-center gap-4">
-                            <form action="{{ route('tasks.toggle', $task) }}" method="POST">
+                        <div class="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto">
+                            <form action="{{ route('tasks.toggle', $task) }}" method="POST" class="flex-1 lg:flex-none">
                                 @csrf @method('PATCH')
-                                <button type="submit" class="px-5 py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all {{ $task->is_completed ? 'border-gray-800 bg-gray-950 text-gray-400' : 'border-emerald-500/30 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white' }}">
+                                <button type="submit" class="w-full lg:w-auto px-5 py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all {{ $task->is_completed ? 'border-gray-800 bg-gray-950 text-gray-400' : 'border-emerald-500/30 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white' }}">
                                     {{ $task->is_completed ? 'Réouvrir' : 'Finir' }}
                                 </button>
                             </form>
@@ -141,7 +141,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="py-20 text-center bg-gray-900/50 rounded-[3rem] border-2 border-dashed border-gray-800 text-gray-500">
+                <div class="py-20 text-center bg-gray-900/50 rounded-[2rem] sm:rounded-[3rem] border-2 border-dashed border-gray-800 text-gray-500 px-4">
                     Aucune mission active.
                 </div>
                 @endforelse

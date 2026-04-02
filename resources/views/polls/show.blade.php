@@ -6,11 +6,11 @@
                 <i class="fa-solid fa-arrow-left-long"></i> Retour à la liste
             </a>
 
-            <div class="mb-10 text-center">
+            <div class="mb-10 text-center px-2">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 mb-6">
                     <i class="fa-solid fa-square-poll-vertical text-2xl text-indigo-500"></i>
                 </div>
-                <h2 class="text-3xl font-black italic tracking-tighter text-white uppercase">
+                <h2 class="text-2xl md:text-3xl font-black italic tracking-tighter text-white uppercase">
                     {{ $poll->title }}
                 </h2>
                 @if($poll->description)
@@ -22,8 +22,8 @@
 
             <form action="{{ route('polls.vote', $poll) }}" method="POST" class="space-y-4">
                 @csrf
-                <div class="bg-gray-900 border border-gray-800 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden relative">
-                    <div class="absolute top-0 right-0 p-6 opacity-5">
+                <div class="bg-gray-900 border border-gray-800 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl overflow-hidden relative">
+                    <div class="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
                         <i class="fa-solid fa-vote-yea text-6xl text-white"></i>
                     </div>
 
@@ -33,9 +33,9 @@
                         @foreach($poll->options as $option)
                             <label class="relative flex items-center group cursor-pointer">
                                 <input type="radio" name="choice" value="{{ $option }}" required class="peer hidden">
-                                <div class="w-full bg-gray-950 border border-gray-800 rounded-2xl p-5 flex items-center justify-between transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-500/5 group-hover:border-gray-700">
+                                <div class="w-full bg-gray-950 border border-gray-800 rounded-2xl p-4 md:p-5 flex items-center justify-between transition-all peer-checked:border-indigo-500 peer-checked:bg-indigo-500/5 group-hover:border-gray-700">
                                     <span class="text-sm font-bold text-gray-400 peer-checked:text-white transition-colors">{{ $option }}</span>
-                                    <div class="w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center peer-checked:border-indigo-500 transition-all">
+                                    <div class="shrink-0 w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center peer-checked:border-indigo-500 transition-all">
                                         <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 scale-0 peer-checked:scale-100 transition-transform"></div>
                                     </div>
                                 </div>

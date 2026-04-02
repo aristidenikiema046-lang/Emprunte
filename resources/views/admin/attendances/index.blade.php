@@ -1,19 +1,19 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto p-6 bg-[#0f172a] rounded-[2.5rem] shadow-2xl border border-slate-800 mt-8 text-slate-200">
+    <div class="max-w-7xl mx-auto p-4 md:p-6 bg-[#0f172a] rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl border border-slate-800 mt-4 md:mt-8 text-slate-200">
         
-        <div class="flex justify-between items-center mb-10">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
             <div>
-                <h2 class="text-2xl font-black tracking-tight text-white italic uppercase">SUPERVISION <span class="text-blue-500">PRÉSENCES</span></h2>
-                <p class="text-[10px] font-bold text-slate-500 tracking-[0.3em] uppercase">Statut en temps réel - {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
+                <h2 class="text-xl md:text-2xl font-black tracking-tight text-white italic uppercase">SUPERVISION <span class="text-blue-500">PRÉSENCES</span></h2>
+                <p class="text-[9px] md:text-[10px] font-bold text-slate-500 tracking-[0.3em] uppercase">Statut en temps réel - {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
             </div>
-            <div class="bg-slate-900/50 p-3 rounded-2xl border border-blue-500/20">
+            <div class="bg-slate-900/50 p-3 rounded-2xl border border-blue-500/20 w-full md:w-auto text-center md:text-left">
                 <i class="fa-solid fa-users-viewfinder text-blue-400 mr-2"></i>
-                <span class="font-mono text-blue-400 font-bold">MODE ADMINISTRATEUR</span>
+                <span class="font-mono text-blue-400 font-bold text-xs md:text-base">MODE ADMINISTRATEUR</span>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-separate border-spacing-y-3">
+        <div class="overflow-x-auto pb-4">
+            <table class="w-full text-left border-separate border-spacing-y-3 min-w-[800px]">
                 <thead>
                     <tr class="text-[10px] font-black uppercase text-slate-500 tracking-widest">
                         <th class="px-6 py-4">Collaborateur</th>
@@ -30,17 +30,16 @@
                         <tr class="bg-slate-900/40 border border-slate-800 hover:bg-slate-800/60 transition-all group rounded-2xl">
                             <td class="px-6 py-4 rounded-l-2xl">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400">
+                                    <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400">
                                         {{ substr($user->name, 0, 2) }}
                                     </div>
-                                    <div>
-                                        <div class="text-sm font-bold text-white">{{ $user->name }}</div>
-                                        <div class="text-[10px] text-slate-500 lowercase">{{ $user->email }}</div>
+                                    <div class="truncate max-w-[150px]">
+                                        <div class="text-sm font-bold text-white truncate">{{ $user->name }}</div>
+                                        <div class="text-[10px] text-slate-500 lowercase truncate">{{ $user->email }}</div>
                                     </div>
                                 </div>
                             </td>
                             
-                            {{-- Colonnes de pointage --}}
                             @foreach(['check_in_8h30', 'check_out_12h00', 'check_in_14h00', 'check_out_17h00'] as $step)
                                 <td class="px-4 py-4">
                                     @if($att && $att->$step)

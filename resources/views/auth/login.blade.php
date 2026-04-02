@@ -44,10 +44,10 @@
     </style>
 </head>
 <body class="bg-main font-sans antialiased text-slate-200">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 px-4">
+    <div class="min-h-screen flex flex-col justify-center items-center py-6 px-4">
         
         {{-- Conteneur de la Carte --}}
-        <div class="w-full sm:max-w-md px-8 py-10 bg-card shadow-2xl overflow-hidden rounded-[2.5rem] border border-slate-800">
+        <div class="w-full max-w-sm sm:max-w-md px-6 py-8 sm:px-8 sm:py-10 bg-card shadow-2xl overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-slate-800">
             
             {{-- Bouton de redirection vers l'accueil --}}
             <div class="mb-10">
@@ -62,7 +62,7 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl mb-4 shadow-xl shadow-indigo-500/20">
                     <span class="text-white text-3xl font-black italic">E</span>
                 </div>
-                <h2 class="text-3xl font-black text-white tracking-tighter uppercase italic">Connexion</h2>
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tighter uppercase italic">Connexion</h2>
                 <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-2">
                     Espace Membre <span class="text-indigo-500 font-black">Emprunte</span>
                 </p>
@@ -112,7 +112,7 @@
                 </div>
 
                 {{-- Options --}}
-                <div class="flex items-center justify-between px-1">
+                <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                     <label for="remember_me" class="inline-flex items-center cursor-pointer group">
                         <input id="remember_me" type="checkbox" class="rounded border-slate-700 text-indigo-600 bg-slate-900 focus:ring-indigo-500 w-4 h-4" name="remember">
                         <span class="ms-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest group-hover:text-slate-300 transition">Rester connecté</span>
@@ -144,7 +144,7 @@
         </div>
 
         {{-- Petit texte de copyright sous la carte --}}
-        <p class="mt-8 text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em]">
+        <p class="mt-8 text-[10px] font-bold text-slate-600 uppercase tracking-[0.3em] text-center">
             &copy; {{ date('Y') }} Emprunte System
         </p>
     </div>

@@ -30,15 +30,23 @@
             }
         </script>
     </head>
-    <body class="font-sans antialiased text-slate-200" style="background-color: #020617;">
+    <body class="font-sans antialiased text-slate-200" style="background-color: #020617;" x-data="{ mobileMenuOpen: false }">
         <div class="flex h-screen overflow-hidden bg-slate-950">
             
-            <nav class="w-64 bg-gray-900 text-white flex flex-col border-r border-gray-800 shrink-0">
-                <div class="p-6 border-b border-gray-800 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                        <span class="text-white font-black text-sm italic">E</span>
+            <nav 
+                :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+                class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col border-r border-gray-800 shrink-0 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0">
+                
+                <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <span class="text-white font-black text-sm italic">E</span>
+                        </div>
+                        <span class="text-lg font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
                     </div>
-                    <span class="text-lg font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
+                    <button @click="mobileMenuOpen = false" class="lg:hidden text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto py-4 space-y-1 custom-scrollbar">
@@ -102,11 +110,29 @@
                 </div>
             </nav>
 
+            <div 
+                x-show="mobileMenuOpen" 
+                x-transition:enter="transition opacity-ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition opacity-ease-in duration-300"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                @click="mobileMenuOpen = false" 
+                class="fixed inset-0 bg-black/50 z-40 lg:hidden">
+            </div>
+
             <div class="flex-1 flex flex-col h-screen overflow-hidden">
-                <header class="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-8 z-40">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle text-[8px] text-emerald-500 animate-pulse"></i>
-                        <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest">Système Opérationnel</span>
+                <header class="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 md:px-8 z-40">
+                    <div class="flex items-center gap-4">
+                        <button @click="mobileMenuOpen = true" class="lg:hidden text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-solid fa-bars-staggered text-xl"></i>
+                        </button>
+
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle text-[8px] text-emerald-500 animate-pulse"></i>
+                            <span class="text-[10px] text-gray-500 font-black uppercase tracking-widest hidden sm:block">Système Opérationnel</span>
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-6">

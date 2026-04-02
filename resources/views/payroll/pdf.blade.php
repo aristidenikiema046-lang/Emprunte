@@ -2,34 +2,86 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Bulletin de Paie - {{ $user->name }}</title>
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.5; font-size: 11pt; margin: 0; padding: 0; }
-        .container { padding: 30px; }
+        /* Base & Responsive */
+        body { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            color: #333; 
+            line-height: 1.5; 
+            font-size: 11pt; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #fff;
+        }
         
-        /* Header */
-        .header { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; margin-bottom: 30px; }
-        .company-name { font-size: 18pt; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
-        .title { text-align: right; font-size: 14pt; color: #7f8c8d; margin-top: -30px; }
+        .container { 
+            width: 90%; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
 
-        /* Infos Sections */
-        .info-table { width: 100%; margin-bottom: 40px; }
-        .info-table td { width: 50%; vertical-align: top; }
+        /* Header Responsive */
+        .header { 
+            border-bottom: 2px solid #2c3e50; 
+            padding-bottom: 10px; 
+            margin-bottom: 30px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .company-name { font-size: 18pt; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
+        .title { font-size: 14pt; color: #7f8c8d; text-align: right; flex-grow: 1; }
+
+        /* Infos Sections - Tableaux fluides */
+        .info-table { width: 100%; margin-bottom: 40px; border-collapse: collapse; }
+        .info-table td { width: 50%; vertical-align: top; padding: 5px; }
         .label { font-weight: bold; color: #2c3e50; }
 
         /* Main Table */
-        .payroll-table { width: 100%; border-collapse: collapse; margin-bottom: 50px; }
+        .payroll-table { width: 100%; border-collapse: collapse; margin-bottom: 50px; table-layout: fixed; }
         .payroll-table th { background-color: #f8f9fa; border-top: 1px solid #dee2e6; border-bottom: 2px solid #dee2e6; padding: 12px; text-align: left; font-size: 10pt; }
-        .payroll-table td { border-bottom: 1px solid #eee; padding: 12px; font-size: 10pt; }
+        .payroll-table td { border-bottom: 1px solid #eee; padding: 12px; font-size: 10pt; word-wrap: break-word; }
         
-        /* Totals */
-        .totals-section { width: 40%; margin-left: auto; border: 1px solid #2c3e50; }
+        /* Totals - Adaptable */
+        .totals-section { 
+            width: 100%; 
+            max-width: 250px; 
+            margin-left: auto; 
+            border: 1px solid #2c3e50; 
+        }
         .total-row { padding: 10px; background: #2c3e50; color: white; text-align: center; }
         .total-amount { font-size: 14pt; font-weight: bold; }
 
         /* Footer */
-        .footer { position: fixed; bottom: 30px; width: 100%; text-align: center; font-size: 8pt; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
+        .footer { 
+            text-align: center; 
+            font-size: 8pt; 
+            color: #95a5a6; 
+            border-top: 1px solid #eee; 
+            padding-top: 10px; 
+            margin-top: 50px;
+        }
+
+        /* Media Query pour les petits écrans */
+        @media screen and (max-width: 600px) {
+            .header { flex-direction: column; text-align: center; }
+            .title { text-align: center; margin-top: 10px; width: 100%; }
+            .info-table td { display: block; width: 100%; text-align: left !important; }
+            .totals-section { margin-right: auto; }
+            .payroll-table { font-size: 9pt; }
+            .payroll-table th, .payroll-table td { padding: 8px 4px; }
+        }
+
+        /* Conservation du format PDF */
+        @media print {
+            .container { width: 100%; padding: 0; }
+            .footer { position: fixed; bottom: 30px; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -43,7 +95,7 @@
             <tr>
                 <td>
                     <div class="label">EMPLOYEUR</div>
-                    <div><Ya-consulting></Ya-consulting></div>
+                    <div>Ya-consulting</div>
                     <div>Siège Social, Abidjan</div>
                     <div>Contact: contact@ya-consulting.com</div>
                 </td>
@@ -57,35 +109,38 @@
             </tr>
         </table>
 
-        <table class="payroll-table">
-            <thead>
-                <tr>
-                    <th>Désignation</th>
-                    <th style="text-align: center;">Nombre / Base</th>
-                    <th style="text-align: right;">Taux</th>
-                    <th style="text-align: right;">Montant (FCFA)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Salaire de base</td>
-                    <td style="text-align: center;">1</td>
-                    <td style="text-align: right;">100%</td>
-                    <td style="text-align: right;">{{ number_format($amount, 0, ',', ' ') }}</td>
-                </tr>
-                <tr>
-                    <td>Prime de transport</td>
-                    <td style="text-align: center;">-</td>
-                    <td style="text-align: right;">-</td>
-                    <td style="text-align: right;">0</td>
-                </tr>
-                <tr style="height: 150px;"> <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="overflow-x: auto;">
+            <table class="payroll-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Désignation</th>
+                        <th style="text-align: center; width: 20%;">Nombre / Base</th>
+                        <th style="text-align: right; width: 20%;">Taux</th>
+                        <th style="text-align: right; width: 20%;">Montant (FCFA)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Salaire de base</td>
+                        <td style="text-align: center;">1</td>
+                        <td style="text-align: right;">100%</td>
+                        <td style="text-align: right;">{{ number_format($amount, 0, ',', ' ') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Prime de transport</td>
+                        <td style="text-align: center;">-</td>
+                        <td style="text-align: right;">-</td>
+                        <td style="text-align: right;">0</td>
+                    </tr>
+                    <tr style="height: 100px;"> 
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="totals-section">
             <div style="padding: 10px; text-align: center; font-weight: bold; color: #2c3e50;">

@@ -20,23 +20,27 @@
 <body class="antialiased bg-[#0f172a] text-slate-200 selection:bg-indigo-500 selection:text-white font-sans">
     
     <nav class="fixed w-full z-50 backdrop-blur-lg border-b border-slate-800 bg-[#0f172a]/80">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-20 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30 shrink-0">
                     <span class="text-white font-black text-xl italic">E</span>
                 </div>
-                <span class="text-xl font-black tracking-tighter text-white uppercase italic">Emprunt<span class="text-indigo-500">E</span></span>
+                <span class="text-lg md:text-xl font-black tracking-tighter text-white uppercase italic truncate">Emprunt<span class="text-indigo-500">E</span></span>
             </div>
 
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 md:gap-6">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="text-xs font-black uppercase tracking-widest hover:text-indigo-400 transition">Tableau de Bord</a>
+                        <a href="{{ url('/dashboard') }}" class="text-[10px] md:text-xs font-black uppercase tracking-widest hover:text-indigo-400 transition">Tableau de Bord</a>
                     @else
-                        <a href="{{ route('login') }}" class="text-xs font-black uppercase tracking-widest hover:text-indigo-400 transition">Connexion</a>
+                        <a href="{{ route('login') }}" class="text-[10px] md:text-xs font-black uppercase tracking-widest hover:text-indigo-400 transition">Connexion</a>
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-xl shadow-indigo-500/20">
+                            <a href="{{ route('register') }}" class="hidden sm:block bg-indigo-600 hover:bg-indigo-500 text-white px-4 md:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition shadow-xl shadow-indigo-500/20">
                                 Demande d'accès
+                            </a>
+                            {{-- Version icône pour mobile très petit --}}
+                            <a href="{{ route('register') }}" class="sm:hidden bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center">
+                                <i class="fa-solid fa-plus"></i>
                             </a>
                         @endif
                     @endauth

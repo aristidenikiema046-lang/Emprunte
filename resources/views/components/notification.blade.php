@@ -7,10 +7,10 @@
      x-transition:leave="transition ease-in duration-100"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     class="fixed bottom-10 right-10 z-[100] max-w-sm w-full bg-gray-900 border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden pointer-events-auto ring-1 ring-black ring-opacity-5">
+     class="fixed bottom-4 left-4 right-4 sm:bottom-10 sm:right-10 sm:left-auto z-[100] max-w-full sm:max-w-sm bg-gray-900 border border-white/10 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden pointer-events-auto ring-1 ring-black ring-opacity-5">
     
     <div class="p-4">
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4">
             {{-- Icône dynamique selon le type --}}
             <div class="flex-shrink-0">
                 @if(session('success'))
@@ -24,16 +24,16 @@
                 @endif
             </div>
 
-            <div class="flex-1">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] {{ session('success') ? 'text-emerald-500' : 'text-red-500' }}">
+            <div class="flex-1 min-w-0">
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] {{ session('success') ? 'text-emerald-500' : 'text-red-500' }} truncate">
                     {{ session('success') ? 'Succès Système' : 'Alerte Système' }}
                 </p>
-                <p class="text-xs font-bold text-slate-300 mt-1">
+                <p class="text-xs font-bold text-slate-300 mt-1 break-words">
                     {{ session('success') ?: session('error') }}
                 </p>
             </div>
 
-            <button @click="show = false" class="text-gray-600 hover:text-white transition-colors px-2">
+            <button @click="show = false" class="text-gray-600 hover:text-white transition-colors px-2 flex-shrink-0">
                 <i class="fa-solid fa-xmark text-xs"></i>
             </button>
         </div>

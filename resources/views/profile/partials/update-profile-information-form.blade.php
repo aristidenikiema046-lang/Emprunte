@@ -17,9 +17,9 @@
         @csrf
         @method('patch')
 
-        {{-- Section Avatar Dark --}}
-        <div class="flex items-center gap-6 p-6 rounded-[2rem] border {{ !$user->avatar ? 'border-red-500/50' : 'border-white/5' }} shadow-inner" style="background-color: #0b0f1a;">
-            <div class="relative">
+        {{-- Section Avatar Dark - Responsive Flex --}}
+        <div class="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-[2rem] border {{ !$user->avatar ? 'border-red-500/50' : 'border-white/5' }} shadow-inner" style="background-color: #0b0f1a;">
+            <div class="relative shrink-0">
                 <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name) }}" 
                      class="w-24 h-24 rounded-3xl object-cover border-2 {{ !$user->avatar ? 'border-red-500' : 'border-blue-500' }} shadow-lg">
                 
@@ -28,12 +28,11 @@
                 @endif
             </div>
             
-            <div class="flex-1">
+            <div class="flex-1 w-full text-center sm:text-left">
                 <label class="block text-[10px] font-black {{ !$user->avatar ? 'text-red-500' : 'text-gray-500' }} uppercase tracking-widest mb-3">
                     Photo de profil {{ !$user->avatar ? '(Obligatoire)' : '' }}
                 </label>
                 
-                {{-- L'input devient REQUIRED si l'avatar est nul --}}
                 <input type="file" name="avatar" 
                     {{ !$user->avatar ? 'required' : '' }}
                     class="block w-full text-xs text-gray-400
@@ -89,8 +88,8 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition shadow-lg shadow-blue-600/20">
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+            <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition shadow-lg shadow-blue-600/20">
                 {{ __('Enregistrer les changements') }}
             </button>
 

@@ -1,8 +1,8 @@
 <x-app-layout>
-    <div class="py-12 bg-[#0f172a] min-h-screen text-white">
+    <div class="py-6 sm:py-12 bg-[#0f172a] min-h-screen text-white">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-[#1e293b] p-10 rounded-[2.5rem] border border-slate-800 shadow-2xl">
-                <h2 class="text-2xl font-black italic mb-8 tracking-tighter uppercase">Envoyer un document</h2>
+            <div class="bg-[#1e293b] p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-slate-800 shadow-2xl">
+                <h2 class="text-xl sm:text-2xl font-black italic mb-8 tracking-tighter uppercase">Envoyer un document</h2>
 
                 <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
@@ -28,11 +28,11 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-6 pt-6">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 px-12 py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20 active:scale-95">
+                    <div class="flex flex-col sm:flex-row items-center gap-6 pt-6">
+                        <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 px-12 py-4 rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20 active:scale-95 text-center">
                             Envoyer
                         </button>
-                        <a href="{{ route('documents.sent') }}" class="text-slate-500 hover:text-white font-bold text-sm border-b border-transparent hover:border-white transition-all uppercase tracking-widest">
+                        <a href="{{ route('documents.sent') }}" class="text-slate-500 hover:text-white font-bold text-sm border-b border-transparent hover:border-white transition-all uppercase tracking-widest text-center">
                             Mes envois
                         </a>
                     </div>

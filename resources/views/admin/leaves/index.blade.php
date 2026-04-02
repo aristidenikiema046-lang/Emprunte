@@ -1,14 +1,14 @@
 <x-app-layout>
-    <div class="py-12 bg-gray-900 min-h-screen text-white">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-slate-800 p-8 rounded-[2.5rem] border border-slate-700 shadow-2xl">
-                <h2 class="text-2xl font-black mb-8 flex items-center gap-3">
+    <div class="py-6 md:py-12 bg-gray-900 min-h-screen text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-slate-800 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-700 shadow-2xl">
+                <h2 class="text-xl md:text-2xl font-black mb-8 flex items-center gap-3">
                     <i class="fa-solid fa-plane-departure text-indigo-500"></i>
                     Gestion des Congés
                 </h2>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="text-slate-500 border-b border-slate-700 text-[10px] uppercase tracking-widest font-black">
                                 <th class="pb-4">Collaborateur</th>
@@ -30,8 +30,8 @@
                                 </td>
                                 <td class="py-5">
                                     @if($leave->attachment)
-                                        <a href="{{ asset('storage/' . $leave->attachment) }}" target="_blank" class="flex items-center gap-2 text-xs bg-indigo-500/10 text-indigo-400 px-3 py-2 rounded-xl border border-indigo-500/20 w-fit hover:bg-indigo-500 hover:text-white transition">
-                                            <i class="fa-solid fa-eye"></i> Voir la PJ
+                                        <a href="{{ asset('storage/' . $leave->attachment) }}" target="_blank" class="flex items-center gap-2 text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-2 rounded-xl border border-indigo-500/20 w-fit hover:bg-indigo-500 hover:text-white transition whitespace-nowrap">
+                                            <i class="fa-solid fa-eye"></i> Voir PJ
                                         </a>
                                     @else
                                         <span class="text-xs text-slate-600 italic">Aucun document</span>
@@ -43,12 +43,12 @@
                                             <form action="{{ route('leaves.updateStatus', $leave) }}" method="POST">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="approuvé">
-                                                <button class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition">Approuver</button>
+                                                <button class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 md:px-4 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition whitespace-nowrap">Approuver</button>
                                             </form>
                                             <form action="{{ route('leaves.updateStatus', $leave) }}" method="POST">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="refusé">
-                                                <button class="bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition">Refuser</button>
+                                                <button class="bg-red-500/10 text-red-500 border border-red-500/20 px-3 md:px-4 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition whitespace-nowrap">Refuser</button>
                                             </form>
                                         </div>
                                     @else
