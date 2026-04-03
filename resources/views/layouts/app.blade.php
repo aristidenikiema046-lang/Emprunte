@@ -144,8 +144,13 @@
                                 </p>
                             </div>
                             <a href="{{ route('profile.show') }}">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=4f46e5&color=fff" 
-                                     class="w-10 h-10 rounded-xl border-2 border-gray-800 shadow-lg hover:border-indigo-500 transition-all">
+                                @if(Auth::user()->photo)
+                                    <img src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                         class="w-10 h-10 rounded-xl border-2 border-gray-800 shadow-lg hover:border-indigo-500 transition-all object-cover">
+                                @else
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=4f46e5&color=fff" 
+                                         class="w-10 h-10 rounded-xl border-2 border-gray-800 shadow-lg hover:border-indigo-500 transition-all">
+                                @endif
                             </a>
                         </div>
                     </div>
