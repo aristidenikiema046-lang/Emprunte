@@ -16,7 +16,7 @@
             <table class="w-full text-left border-separate border-spacing-y-3 min-w-[800px]">
                 <thead>
                     <tr class="text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                        <th class="px-6 py-4">Collaborateur</th>
+                        <th class="px-6 py-4">Collaborateur / Planning</th>
                         <th class="px-4 py-4">Arrivée (8h30)</th>
                         <th class="px-4 py-4">Pause (12h)</th>
                         <th class="px-4 py-4">Reprise (14h)</th>
@@ -33,9 +33,20 @@
                                     <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400">
                                         {{ substr($user->name, 0, 2) }}
                                     </div>
-                                    <div class="truncate max-w-[150px]">
+                                    <div class="truncate max-w-[180px]">
                                         <div class="text-sm font-bold text-white truncate">{{ $user->name }}</div>
-                                        <div class="text-[10px] text-slate-500 lowercase truncate">{{ $user->email }}</div>
+                                        {{-- NOUVEAU : AFFICHAGE DU PLANNING SOUS LE NOM --}}
+                                        <div class="flex gap-1 mt-1">
+                                            @php 
+                                                $joursComplets = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+                                                $userDays = $user->availability ? $user->availability->days : [];
+                                            @endphp
+                                            @foreach(['L', 'M', 'M', 'J', 'V'] as $idx => $initiale)
+                                                <span class="text-[7px] w-3 h-3 flex items-center justify-center rounded-sm font-black {{ in_array($joursComplets[$idx], $userDays) ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-600' }}">
+                                                    {{ $initiale }}
+                                                </span>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </td>

@@ -51,7 +51,7 @@
         @endif
 
         {{-- Grid de Pointage --}}
-        <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             @php
                 $steps = [
                     'check_in_8h30'   => ['label' => 'Arrivée', 'time' => '08:30', 'h' => 8, 'm' => 0],
@@ -93,6 +93,39 @@
                 </button>
             @endforeach
         </div>
+
+        {{-- NOUVEAU : BLOC PLANNING --}}
+        <div class="p-6 md:p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800">
+            <div class="flex items-center gap-3 mb-6">
+                <i class="fa-solid fa-calendar-check text-blue-500 text-lg"></i>
+                <div>
+                    <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Planning de présence</h3>
+                    <p class="text-[8px] font-bold text-slate-500 uppercase">Sélectionnez vos 3 jours obligatoires</p>
+                </div>
+            </div>
+            
+            <form action="{{ route('attendances.updateAvailability') }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-5 gap-2 md:gap-4 mb-6">
+                    @php 
+                        $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+                        $selectedDays = $myAvailability ? $myAvailability->days : [];
+                    @endphp
+                    @foreach($jours as $j)
+                        <label class="group cursor-pointer">
+                            <input type="checkbox" name="days[]" value="{{ $j }}" class="hidden peer" {{ in_array($j, $selectedDays) ? 'checked' : '' }}>
+                            <div class="py-4 rounded-2xl border border-slate-800 bg-slate-950 flex flex-col items-center gap-1 transition-all group-hover:border-slate-700 peer-checked:border-blue-500 peer-checked:bg-blue-500/10">
+                                <span class="text-[9px] font-black uppercase text-slate-500 peer-checked:text-blue-400">{{ substr($j, 0, 3) }}</span>
+                                <div class="w-1.5 h-1.5 rounded-full bg-slate-800 peer-checked:bg-blue-500"></div>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+                <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase rounded-2xl transition-all shadow-lg shadow-blue-900/20">
+                    Enregistrer mes disponibilités
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -105,8 +138,10 @@
 
         function updateClock() {
             const now = new Date();
-            document.getElementById('horloge').textContent = now.toLocaleTimeString('fr-FR', {hour12:false});
-            document.getElementById('date-jour').textContent = now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+            const clockEl = document.getElementById('horloge');
+            const dateEl = document.getElementById('date-jour');
+            if(clockEl) clockEl.textContent = now.toLocaleTimeString('fr-FR', {hour12:false});
+            if(dateEl) dateEl.textContent = now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
         }
 
         if (navigator.geolocation) {

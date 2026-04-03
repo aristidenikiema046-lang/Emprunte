@@ -46,9 +46,13 @@ Route::middleware('auth')->group(function () {
     })->name('attendances.index');
 
     Route::post('/attendances/store', [AttendanceController::class, 'store'])->name('attendances.store');
+    
+    // NOUVELLE ROUTE : Enregistrement du planning (disponibilités)
+    Route::post('/attendances/availability', [AttendanceController::class, 'updateAvailability'])->name('attendances.updateAvailability');
 
     // --- Tâches (Missions) ---
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    // ... (Reste des routes tâches inchangé)
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.updateProgress');
@@ -56,6 +60,7 @@ Route::middleware('auth')->group(function () {
     
     // --- Congés ---
     Route::get('/leaves', [LeaveController::class, 'index'])->name('leaves.index');
+    // ... (Reste des routes congés inchangé)
     Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
     Route::patch('/leaves/{leave}/status', [LeaveController::class, 'updateStatus'])->name('leaves.updateStatus');
 
@@ -83,20 +88,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
 
-    // --- Sondages (CORRIGÉ) ---
+    // --- Sondages ---
     Route::prefix('polls')->name('polls.')->group(function () {
         Route::get('/', [PollController::class, 'index'])->name('index');
 
-        // Les routes spécifiques (Admin) doivent être AVANT les routes avec paramètres {poll}
         Route::middleware('can:admin-only')->group(function() {
             Route::get('/create', [PollController::class, 'create'])->name('create');
             Route::post('/', [PollController::class, 'store'])->name('store');
         });
 
-        // Les routes dynamiques en dernier
         Route::get('/{poll}', [PollController::class, 'show'])->name('show');
         Route::post('/{poll}/vote', [PollController::class, 'vote'])->name('vote');
-        Route::get('/{poll}/results', [PollController::class, 'results'])->name('results'); // Ajout pour la vue index
+        Route::get('/{poll}/results', [PollController::class, 'results'])->name('results');
     });
 
     // --- Documents ---

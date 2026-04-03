@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\User;
+use App\Models\Availability;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,27 @@ class AttendanceController extends Controller
             ->distinct()
             ->count();
 
-        return view('attendances.index', compact('attendance', 'daysPresentCount'));
+        // Récupération des disponibilités de l'utilisateur
+        $myAvailability = Availability::where('user_id', $userId)->first();
+
+        return view('attendances.index', compact('attendance', 'daysPresentCount', 'myAvailability'));
+    }
+
+    /**
+     * Enregistre les jours de disponibilité choisis par l'utilisateur
+     */
+    public function updateAvailability(Request $request)
+    {
+        $request->validate([
+            'days' => 'required|array|min:1',
+        ]);
+
+        Availability::updateOrCreate(
+            ['user_id' => Auth::id()],
+            ['days' => $request->days]
+        );
+
+        return back()->with('success', 'Vos jours de présence ont été enregistrés.');
     }
 
     public function store(Request $request)

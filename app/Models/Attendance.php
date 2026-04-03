@@ -29,14 +29,11 @@ class Attendance extends Model
         'is_completed' => 'boolean',
     ];
 
-    // Calcul du retard à l'arrivée
     public function getRetardMinutesAttribute()
     {
         if (!$this->check_in_8h30) return 0;
-        
         $heureTheorique = Carbon::parse($this->date)->setTime(8, 30);
         $heureReelle = $this->check_in_8h30;
-
         if ($heureReelle->gt($heureTheorique->addMinutes(5))) {
             return $heureReelle->diffInMinutes($heureTheorique);
         }
