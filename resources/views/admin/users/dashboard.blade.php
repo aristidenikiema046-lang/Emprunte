@@ -9,7 +9,7 @@
                 </h2>
                 <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-blue-600 rounded-full animate-ping"></span>
-                    Système ManageX opérationnel — {{ now()->translatedFormat('H:i') }}
+                    Système Emprunte opérationnel — {{ now()->translatedFormat('H:i') }}
                 </p>
             </div>
             

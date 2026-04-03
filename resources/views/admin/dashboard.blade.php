@@ -14,7 +14,7 @@
             </div>
             <div class="hidden md:block text-right">
                 <p class="text-white font-black text-xl uppercase tracking-tighter">{{ now()->translatedFormat('d F Y') }}</p>
-                <p class="text-blue-500 text-[9px] font-black uppercase tracking-[0.2em] italic">ManageX Core System</p>
+                <p class="text-blue-500 text-[9px] font-black uppercase tracking-[0.2em] italic">Emprunte Core System</p>
             </div>
         </div>
 
